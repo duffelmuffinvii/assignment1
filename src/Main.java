@@ -1,21 +1,23 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.sql.Array;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
 
+        ArrayList<Node> map = new ArrayList<Node>();
+
         try {
-            File myObj = new File("maps/assignment 1, sample board.txt");
-            Scanner myReader = new Scanner(myObj);
-            while (myReader.hasNextLine()) {
-                String data = myReader.nextLine();
-                System.out.println(data);
+            File file = new File("maps/assignment 1, sample board.txt");
+            Scanner scanner = new Scanner(file);
+            while (scanner.hasNextLine()) {
+
             }
-            myReader.close();
+            scanner.close();
         } catch (FileNotFoundException e) {
-            System.out.println("An error occurred.");
             e.printStackTrace();
         }
 
