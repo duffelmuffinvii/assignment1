@@ -25,7 +25,9 @@ public class Main {
                         x++;
                     }
                     if (curr == 'S') {x++;}
-                    if (curr == 'G') {x++;}
+                    if (curr == 'G') {
+                        map.add(new Node(x, y, 0));
+                    }
                 }
                 y++;
             }
