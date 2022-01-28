@@ -9,10 +9,10 @@ public class Node implements Comparable{
     private double g;
     // Heuristic
     private double h;
-    private LinkedList<Node> adj;
+    private LinkedList<Integer> adj;
     private int ID;
 
-    public Node(Node parent, LinkedList<Node> adj, int ID) {
+    public Node(Node parent, LinkedList<Integer> adj, int ID) {
         this.parent = parent;
         this.adj = adj;
         this.ID = ID;
@@ -42,7 +42,7 @@ public class Node implements Comparable{
         return h;
     }
 
-    public LinkedList<Node> getAdj() {
+    public LinkedList<Integer> getAdj() {
         return adj;
     }
 
