@@ -37,7 +37,7 @@ public class Main {
         }
 
         for (Node n : map) {
-            System.out.println(n.x + ", " + n.y + ": " + n.cmplxty);
+                System.out.println(n.x + ", " + n.y + ": " + n.cmplxty);
         }
 
     }

@@ -1,13 +1,27 @@
 package main;
 
-public class Node {
-    int x;
-    int y;
-    int cmplxty;
+public class Node implements Comparable{
+    private Node parent;
+    private int x, y;
+    // Cost so far
+    private double g;
+    // Heuristic
+    private double h;
+    private LinkedList<Node> adj;
+    private int ID;
 
-    public Node(int x, int y, int cmplxty) {
-        this.x = x;
-        this.y = y;
-        this.cmplxty = cmplxty;
+    public Node(Node parent, LinkedList<Node> adj, int ID) {
+        this.parent = parent;
+        this.adj = adj;
+        this.ID = ID;
+    }
+
+    public int getID() {
+        return ID;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        return 0;
     }
 }
