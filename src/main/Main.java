@@ -21,12 +21,12 @@ public class Main {
                 for (int i = 0; i < line.length(); i++) {
                     char curr = line.charAt(i);
                     if (Character.isDigit(curr)) {
-                        map.add(new Node(x, y, Integer.parseInt(String.valueOf(curr))));
+                        //map.add(new Node(x, y, Integer.parseInt(String.valueOf(curr))));
                         x++;
                     }
                     if (curr == 'S') {x++;}
                     if (curr == 'G') {
-                        map.add(new Node(x, y, 0));
+                        //map.add(new Node(x, y, 0));
                     }
                 }
                 y++;
@@ -37,7 +37,7 @@ public class Main {
         }
 
         for (Node n : map) {
-                System.out.println(n.x + ", " + n.y + ": " + n.cmplxty);
+                //System.out.println(n.x + ", " + n.y + ": " + n.cmplxty);
         }
 
     }
