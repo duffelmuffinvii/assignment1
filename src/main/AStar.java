@@ -19,7 +19,7 @@ public class AStar {
     /**
      * The core of A*, setting all the gCost, hCost and direction of the path
      */
-    private void findPathPreGame() {
+    private void findPath1() {
         Node starting = getNodeFromID(startID);
         Node ending = getNodeFromID(endID);
 
@@ -49,27 +49,37 @@ public class AStar {
             openNodes.remove(currentNode);
             visitedNodes.add(currentNode);
 
-//            // if true, path has been found, then return
-//            if (isEnd(currentNode)){return; }
-//
-//            for (AlgoNode neighbor: adjacenciesToNodes(currentNode) ){ //adjacencies has to list of  nodes
-//
-//                // we need to discuss about the conditions that make a node "walkable" - all our nodes are walkable
-//                //skip to the next neighbor
-//                if (visitedNodes.contains(neighbor))
-//                    continue;
-//
-//                int newMovementCostToNeighbor = currentNode.get_gCost() + getDistance(currentNode,neighbor  );
-//
-//                if (newMovementCostToNeighbor < neighbor.get_gCost() || !openNodes.contains(neighbor)){
-//                    neighbor.set_gCost(newMovementCostToNeighbor);
-//                    neighbor.set_hCost(getDistance(neighbor,ending));
-//                    neighbor.setParent(currentNode);
-//
-//                    if (!openNodes.contains(neighbor)) openNodes.add(neighbor);
-//                }
-//            }
+            // if true, path has been found, then return
+            if (isEnd(currentNode)){return; }
+
+            for (Node neighbor: adjacenciesToNodes(currentNode) ){ //adjacencies has to list of  nodes
+
+                // we need to discuss about the conditions that make a node "walkable" - all our nodes are walkable
+                //skip to the next neighbor
+                if (visitedNodes.contains(neighbor))
+                    continue;
+
+                double newMovementCostToNeighbor = currentNode.getG() + getDistance(currentNode,neighbor  );
+
+                if (newMovementCostToNeighbor < neighbor.getG() || !openNodes.contains(neighbor)){
+                    neighbor.setG(newMovementCostToNeighbor);
+                    neighbor.setH(getDistance(neighbor,ending));
+                    neighbor.setParent(currentNode);
+
+                    if (!openNodes.contains(neighbor)) openNodes.add(neighbor);
+                }
+            }
         }
+    }
+
+    public LinkedList<Node> adjacenciesToNodes(Node node) {
+        LinkedList<Node> list = new LinkedList<>();
+        for (int s : node.getAdjacencies()) {
+            for (Node n : allNodes) {
+                if (n.getID() == s) list.add(n);
+            }
+        }
+        return list;
     }
 
     private Node getNodeFromID(int ID){
@@ -89,6 +99,22 @@ public class AStar {
     public boolean lowerFCost(Node n , Node currentNode) {
         return n.getFCost() < currentNode.getFCost() ||
                 (n.getFCost() == currentNode.getFCost() && n.getH() < currentNode.getH());
+    }
+
+    public boolean isEnd(Node n) {
+        return n.getID() == endID;
+    }
+
+    private double getDistance(Node nodeA, Node nodeB){
+        double nodeAXCoordinate = nodeA.getX();
+        double nodeAYCoordinate = nodeA.getY();
+        double nodeBXCoordinate = nodeB.getX();
+        double nodeBYCoordinate = nodeB.getY();
+
+        double xDifference = nodeBXCoordinate - nodeAXCoordinate;
+        double yDifference = nodeBYCoordinate - nodeAYCoordinate;
+
+        return (int)Math.sqrt(xDifference*xDifference + yDifference*yDifference);
     }
 
 

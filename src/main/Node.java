@@ -42,12 +42,20 @@ public class Node implements Comparable{
         return h;
     }
 
-    public LinkedList<Integer> getAdj() {
+    public LinkedList<Integer> getAdjacencies() {
         return adj;
     }
 
     public void setParent(Node parent) {
         this.parent = parent;
+    }
+
+    public void setG(double g) {
+        this.g = g;
+    }
+
+    public void setH(double h) {
+        this.h = h;
     }
 
     @Override
@@ -58,4 +66,5 @@ public class Node implements Comparable{
     public double getFCost() {
         return g + h;
     }
+
 }
