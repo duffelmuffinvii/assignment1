@@ -39,6 +39,52 @@ public class Main {
         for (Node n : map) {
                 //System.out.println(n.x + ", " + n.y + ": " + n.cmplxty);
         }
+        
+        //code to generate a board
+        int i = 3;
+        int j = 4;
+        String[][] b0 = generateBoard(i, j);
 
+    }
+    
+    public String[][] generateBoard(int i, int j) //pass in desired row and column
+    {
+        String[][] b = new String[i][j];
+        int[] i_pos = new int[i];
+        int[] j_pos = new int[j];
+        int temp;
+
+        for(int u = 0; u < i; u++) //generate list of all possible col positions
+        {
+            i_pos.add(u);
+        }
+        for(int v = 0; v < j; v++) //generate list of all possible col positions
+        {
+            j_pos.add(v);
+        }
+
+        int g_r = i_pos.get((int) (Math.random()*(i_pos.length))); //give a row spot to the goal state
+        int g_c = j_pos.get((int) (Math.random()*(j_pos.length))); //give a col spot to the goal state
+        i_pos.remove(g_r);
+        j_pos.remove(g_c);
+        b[g_r][g_c] = "G";
+        int s_r = i_pos.get((int) (Math.random()*(i_pos.length))); //repeating above with start spot
+        int s_c = j_pos.get((int) (Math.random()*(j_pos.length)));
+        b[s_r][s_c] = "S";
+
+
+        for(int x = 0; x < b.length; x++)
+        {
+            for(int y = 0; y < b[0].length; y++)
+            {
+                if(b[x][y] == null)
+                {
+                    temp = (int)(Math.random()*(9 - 1) + 1);
+                    b[x][y] = String.valueOf(temp);
+                }
+            }
+        }
+
+        return b;
     }
 }
