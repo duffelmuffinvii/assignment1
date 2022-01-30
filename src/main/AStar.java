@@ -8,12 +8,14 @@ public class AStar {
     private int endID;
     private LinkedList<Node> allNodes;
     private char dir;
+    private int heuristic;
 
-    public AStar(int startID, int endID, LinkedList<Node> allNodes) {
+    public AStar(int startID, int endID, LinkedList<Node> allNodes, int heuristic) {
         this.startID = startID;
         this.endID = endID;
         this.allNodes = allNodes;
         this.dir = 'N';
+        this.heuristic = heuristic;
     }
 
     /**
@@ -31,8 +33,6 @@ public class AStar {
 
         // adding the starting node to the openNodes list
         openNodes.add(starting);
-
-        //HashMap<String, AlgoNode> Nodes = allNodes;
 
         // looping
         while(!openNodes.isEmpty()){
@@ -59,11 +59,47 @@ public class AStar {
                 if (visitedNodes.contains(neighbor))
                     continue;
 
-                double newMovementCostToNeighbor = currentNode.getG() + getDistance(currentNode,neighbor  );
+                double h;
+
+                switch (heuristic) {
+                    case 0:
+                        h = 0;
+                        break;
+                    case 1:
+                        h = getLowerDist(currentNode, neighbor);
+                        break;
+                    case 2:
+                        h = getHigherDist(currentNode, neighbor);
+                        break;
+                    case 3:
+                        h = sumDist(currentNode, neighbor);
+                        break;
+                    default:
+                        h = getDistance(currentNode, neighbor);
+                }
+
+                double newMovementCostToNeighbor = currentNode.getG() + h;
 
                 if (newMovementCostToNeighbor < neighbor.getG() || !openNodes.contains(neighbor)){
                     neighbor.setG(newMovementCostToNeighbor);
-                    neighbor.setH(getDistance(neighbor,ending));
+
+                    switch (heuristic) {
+                        case 0:
+                            neighbor.setH(0);
+                            break;
+                        case 1:
+                            neighbor.setH(getLowerDist(neighbor, ending));
+                            break;
+                        case 2:
+                            neighbor.setH(getHigherDist(neighbor, ending));
+                            break;
+                        case 3:
+                            neighbor.setH(sumDist(neighbor, ending));
+                            break;
+                        default:
+                            neighbor.setH(getDistance(neighbor, ending));
+
+                    }
                     neighbor.setParent(currentNode);
 
                     if (!openNodes.contains(neighbor)) openNodes.add(neighbor);
@@ -117,5 +153,24 @@ public class AStar {
         return (int)Math.sqrt(xDifference*xDifference + yDifference*yDifference);
     }
 
+    private double getLowerDist(Node nodeA, Node nodeB) {
+        double xdist = Math.abs(nodeA.getX() - nodeB.getX());
+        double ydist = Math.abs(nodeA.getY() - nodeB.getY());
+
+        if (xdist < ydist) return xdist;
+        else return ydist;
+    }
+
+    private double getHigherDist(Node nodeA, Node nodeB) {
+        double xdist = Math.abs(nodeA.getX() - nodeB.getX());
+        double ydist = Math.abs(nodeA.getY() - nodeB.getY());
+
+        if (xdist > ydist) return xdist;
+        else return ydist;
+    }
+
+    private double sumDist(Node nodeA, Node nodeB) {
+        return Math.abs(nodeA.getX() - nodeB.getX()) + Math.abs(nodeA.getY() - nodeB.getY());
+    }
 
 }
