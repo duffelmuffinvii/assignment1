@@ -1,21 +1,57 @@
 package main;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Node implements Comparable{
-    private Node parent;
-    private int x, y;
+public class Node implements Comparable<Node>{
+    private int ID;
+    private int x, y, xmax, ymax;
+    private Directions dir;
+    private Node parent = null;
     // Cost so far
     private double g;
     // Heuristic
     private double h;
-    private LinkedList<Integer> adj;
-    private int ID;
+    private int complex;
+    private List<Edge> neighbors;
 
-    public Node(Node parent, LinkedList<Integer> adj, int ID) {
-        this.parent = parent;
-        this.adj = adj;
-        this.ID = ID;
+    enum Directions{
+        NORTH,
+        WEST,
+        EAST,
+        SOUTH
+    }
+
+    public Node(int x, int y, int xmax, int ymax, double h, int complex, Directions direct) {
+        this.x = x;
+        this.y = y;
+        this.xmax = xmax;
+        this.ymax = ymax;
+        this.h = h;
+        this.neighbors = new ArrayList<Edge>();
+        this.complex = complex;
+        if(direct == null){
+            // Default to NORTH if no direction given
+            this.dir = Directions.NORTH;
+        } else{
+            this.dir = direct;
+        }
+    }
+
+    private void initNeighbor(){
+        switch(dir){
+            case NORTH:
+
+            case WEST:
+            case EAST:
+            case SOUTH:
+            default:
+                break;
+        }
+    }
+
+    public boolean inBound(int x, int y){
+        return x >= 0 && x <= xmax && y >= 0 && y <= ymax;
     }
 
     public int getID() {
@@ -25,11 +61,13 @@ public class Node implements Comparable{
     public Node getParent() {
         return parent;
     }
+    public void setParent(Node parent) {
+        this.parent = parent;
+    }
 
     public int getX() {
         return x;
     }
-
     public int getY() {
         return y;
     }
@@ -37,34 +75,23 @@ public class Node implements Comparable{
     public double getG() {
         return g;
     }
-
-    public double getH() {
-        return h;
-    }
-
-    public LinkedList<Integer> getAdjacencies() {
-        return adj;
-    }
-
-    public void setParent(Node parent) {
-        this.parent = parent;
-    }
-
     public void setG(double g) {
         this.g = g;
     }
 
+    public double getH() {
+        return h;
+    }
     public void setH(double h) {
         this.h = h;
-    }
-
-    @Override
-    public int compareTo(Object o) {
-        return 0;
     }
 
     public double getFCost() {
         return g + h;
     }
 
+    @Override
+    public int compareTo(Node n) {
+        return Double.compare(this.getFCost(), n.getFCost());
+    }
 }
