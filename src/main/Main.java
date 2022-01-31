@@ -12,7 +12,7 @@ public class Main {
         ArrayList<Node> map = new ArrayList<Node>();
 
         try {
-            File file = new File("maps/assignment 1, sample board.txt");
+            /*File file = new File("maps/assignment 1, sample board.txt");
             Scanner scanner = new Scanner(file);
             int y = 0;
             while (scanner.hasNextLine()) {
@@ -31,7 +31,35 @@ public class Main {
                 }
                 y++;
             }
+            scanner.close(); */
+            
+            String[][] board; 
+            String temp = "";
+            ArrayList<String> t = new ArrayList<String>();
+            File file = new File("maps/assignment 1, sample board.txt");
+            Scanner scanner = new Scanner(file);
+            while(scanner.hasNextLine())
+            {
+                temp = scanner.nextLine();
+                t.add(temp);
+            }
             scanner.close();
+            int r_len = t.size();
+            int c_len = (t.get(0).length() + 1) / 2;
+
+            board = new String[r_len][c_len];
+            int col;
+
+            for(int q = 0; q < t.size(); q++)
+            {
+                temp = t.get(q);
+                for (int s = 0; s < temp.length(); s++) {
+                    if (!temp.charAt(s).equals("  ")) {
+                        board[q][s / 2] = temp;
+                    }
+                }
+            }
+            
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
