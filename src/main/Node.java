@@ -5,8 +5,7 @@ import java.util.List;
 
 public class Node implements Comparable<Node>{
     private int ID;
-    private int x, y, xmax, ymax;
-    private Directions dir;
+    private int x, y;
     private Node parent = null;
     // Cost so far
     private double g;
@@ -22,37 +21,28 @@ public class Node implements Comparable<Node>{
         SOUTH
     }
 
-    public Node(int x, int y, int xmax, int ymax, double h, int complex, Directions direct) {
+    public Node(int x, int y, int complex) {
         this.x = x;
         this.y = y;
-        this.xmax = xmax;
-        this.ymax = ymax;
-        this.h = h;
-        this.neighbors = new ArrayList<Edge>();
+        this.neighbors = new ArrayList<>();
         this.complex = complex;
-        if(direct == null){
-            // Default to NORTH if no direction given
-            this.dir = Directions.NORTH;
-        } else{
-            this.dir = direct;
-        }
     }
 
-    private void initNeighbor(){
-        switch(dir){
-            case NORTH:
+//    private void initNeighbor(){
+//        switch(dir){
+//            case NORTH:
+//
+//            case WEST:
+//            case EAST:
+//            case SOUTH:
+//            default:
+//                break;
+//        }
+//    }
 
-            case WEST:
-            case EAST:
-            case SOUTH:
-            default:
-                break;
-        }
-    }
-
-    public boolean inBound(int x, int y){
-        return x >= 0 && x <= xmax && y >= 0 && y <= ymax;
-    }
+//    public boolean inBound(int x, int y){
+//        return x >= 0 && x <= xmax && y >= 0 && y <= ymax;
+//    }
 
     public int getID() {
         return ID;
@@ -88,6 +78,15 @@ public class Node implements Comparable<Node>{
 
     public double getFCost() {
         return g + h;
+    }
+
+    public int getComplex() {return this.complex;}
+
+    public List<Node> getNeighbors() {
+        return neighbors;
+    }
+    public void setNeighbors(ArrayList<Node> neighbors) {
+        this.neighbors = neighbors;
     }
 
     @Override

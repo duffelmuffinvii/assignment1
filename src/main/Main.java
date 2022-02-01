@@ -6,67 +6,56 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
-
     public static void main(String[] args) {
 
-        ArrayList<Node> map = new ArrayList<Node>();
+        //take in file name (of the board) and number of which heuristic to use
+        Scanner scan = new Scanner(System.in);
+        System.out.println("Enter File Name (for example, Board.txt)");
+        String file_name = scan.nextLine();
 
-        try {
-            /*File file = new File("maps/assignment 1, sample board.txt");
-            Scanner scanner = new Scanner(file);
-            int y = 0;
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-                int x = 0;
-                for (int i = 0; i < line.length(); i++) {
-                    char curr = line.charAt(i);
-                    if (Character.isDigit(curr)) {
-                        //map.add(new Node(x, y, Integer.parseInt(String.valueOf(curr))));
-                        x++;
-                    }
-                    if (curr == 'S') {x++;}
-                    if (curr == 'G') {
-                        //map.add(new Node(x, y, 0));
-                    }
-                }
-                y++;
-            }
-            scanner.close(); */
-            
-            String[][] board; 
-            String temp = "";
-            ArrayList<String> t = new ArrayList<String>();
-            File file = new File("maps/assignment 1, sample board.txt");
+        System.out.println("Enter Heuristic Number (1 through 6):");
+        int heuristic = Integer.parseInt(scan.nextLine());
+
+        String temp = "";
+        ArrayList<String[]> t = new ArrayList<>();
+        int inputHeuristic = 1;
+        try{
+            File file = new File(args[0]);
+            inputHeuristic = Integer.parseInt((args[1]));
             Scanner scanner = new Scanner(file);
             while(scanner.hasNextLine())
             {
                 temp = scanner.nextLine();
-                t.add(temp);
+                String[] line = temp.split("\t");
+                t.add(line);
             }
             scanner.close();
-            int r_len = t.size();
-            int c_len = (t.get(0).length() + 1) / 2;
-
-            board = new String[r_len][c_len];
-            int col;
-
-            for(int q = 0; q < t.size(); q++)
-            {
-                temp = t.get(q);
-                for (int s = 0; s < temp.length(); s++) {
-                    if (!temp.charAt(s).equals("  ")) {
-                        board[q][s / 2] = temp;
-                    }
-                }
-            }
-            
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
-        for (Node n : map) {
-                //System.out.println(n.x + ", " + n.y + ": " + n.cmplxty);
-        }
+        int r_len = t.size();
+        int c_len = t.get(0).length;
+        int[][] board = new int[r_len][c_len];
+        Node start;
+        Node end;
+
+            for(int i = 0; i < t.size(); i++)
+            {
+                for (int j = 0; j < t.get(0).length; j++) {
+                    System.out.println(t.get(i)[j]);
+                    if (t.get(i)[j].equals("S")) {
+                        start = new Node(i, j, 1);
+                        //System.out.println("s");
+                    } else if (t.get(i)[j].equals("G")) {
+                        end = new Node(i, j, 1);
+                        //System.out.println("g");
+                    }
+                }
+            }
+            printBoard(board);
+
+
         
         //code to generate a board
         int i = 3;
