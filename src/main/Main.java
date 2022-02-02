@@ -21,7 +21,7 @@ public class Main {
         ArrayList<String[]> t = new ArrayList<>();
         int inputHeuristic = 1;
         try{
-            File file = new File("C:\\Users\\stick\\IdeaProjects\\assignment1real\\maps\\SampleBoard.txt");
+            File file = new File(args[0]);
             inputHeuristic = Integer.parseInt((args[1]));
             Scanner scanner = new Scanner(file);
             while(scanner.hasNextLine())
@@ -58,7 +58,7 @@ public class Main {
                 }
             }
         }
-        printBoard(board);
+        //printBoard(board);
 
         AStar astar;
 
