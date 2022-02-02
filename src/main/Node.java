@@ -11,7 +11,7 @@ public class Node implements Comparable<Node>{
     private double g;
     // Heuristic
     private double h;
-    private int complex;
+    private double complex;
     // Neighbors
     private List<Node> neighbors;
 
@@ -81,7 +81,7 @@ public class Node implements Comparable<Node>{
         return g + h;
     }
 
-    public int getComplex() {return this.complex;}
+    public double getComplex() {return this.complex;}
 
     public List<Node> getNeighbors() {
         return neighbors;

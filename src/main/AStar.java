@@ -10,7 +10,8 @@ public class AStar {
     private int[][] board;
     private int xmax;
     private int ymax;
-    private int timeCost;
+    private double score;
+    private int actions;
 
     public AStar(Node start, Node end, int[][] board, int heuristic) {
         this.start = start;
@@ -21,7 +22,8 @@ public class AStar {
         this.board = board;
         this.xmax = board[0].length;
         this.ymax = board.length;
-        this.timeCost = 0;
+        this.score = 100;
+        this.actions = 0;
     }
 
     public LinkedList<Node> getFullPath() {
@@ -29,7 +31,6 @@ public class AStar {
         currentPath.add(start);
 
         while (!isAt(currentPath.getLast(), end)) {
-            System.out.println("up to y " + currentPath.getLast().getY() + ", x " + currentPath.getLast().getX());
             currentPath = path(currentPath);
         }
 
@@ -46,6 +47,7 @@ public class AStar {
         Node[] adj = getAdj(s);
 
         double fVals[] = new double[4];
+        double gVals[] = new double[4];
 
         for (int i = 0; i < adj.length; i++) {
             Node n = adj[i];
@@ -81,6 +83,7 @@ public class AStar {
             } else g = 99;
 
             fVals[i] = h + g;
+            gVals[i] = g;
         }
 
         double min = 100;
@@ -99,7 +102,22 @@ public class AStar {
 
         path.add(adj[minIndex]);
         dir = minIndex;
-        timeCost += min;
+        actions++;
+        score -= gVals[minIndex];
+        switch (dir) {
+            case 0:
+                System.out.println("North");
+                break;
+            case 1:
+                System.out.println("East");
+                break;
+            case 2:
+                System.out.println("South");
+                break;
+            case 3:
+                System.out.println("West");
+                break;
+        }
         return path;
 
     }
@@ -134,7 +152,6 @@ public class AStar {
     }
 
     public boolean coordInBounds(int x, int y) {
-        //System.out.println(y + ", " + x);
         return x < xmax && x >= 0 && y < ymax && y >= 0;
     }
 
@@ -158,10 +175,6 @@ public class AStar {
         return Math.abs(nodeA.getX() - nodeB.getX()) + Math.abs(nodeA.getY() - nodeB.getY());
     }
 
-    public Node getStart() {
-        return start;
-    }
-
     public boolean pathContains(LinkedList<Node> p, Node n) {
         for (Node x : p) {
             if (x.getX() == n.getX() && x.getY() == n.getY()) return true;
@@ -171,6 +184,14 @@ public class AStar {
 
     public boolean isAt(Node a, Node b) {
         return a.getX() == b.getX() && a.getY() == b.getY();
+    }
+
+    public int getActions() {
+        return actions;
+    }
+
+    public double getScore() {
+        return score;
     }
 
     //    private void findPath1() {

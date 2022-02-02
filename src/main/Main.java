@@ -21,7 +21,7 @@ public class Main {
         ArrayList<String[]> t = new ArrayList<>();
         int inputHeuristic = 1;
         try{
-            File file = new File("C:\\Users\\stick\\IdeaProjects\\assignment1real\\maps\\SampleBoard.txt");
+            File file = new File(args[0]);
             inputHeuristic = Integer.parseInt((args[1]));
             Scanner scanner = new Scanner(file);
             while(scanner.hasNextLine())
@@ -68,9 +68,9 @@ public class Main {
         else {
             astar = new AStar(start, end, board, inputHeuristic);
             LinkedList<Node> path = astar.getFullPath();
-            for (Node n : path) {
-                System.out.println("y: " + n.getY() + ", x: " + n.getX());
-            }
+
+            System.out.println(astar.getActions() + " actions");
+            System.out.println("Score: " + astar.getScore());
         }
 
         //code to generate a board
