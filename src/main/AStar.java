@@ -67,6 +67,12 @@ public class AStar {
                     case 4:
                         h = sumDist(n, end);
                         break;
+                    case 5:
+                        euclideanDistance(n, end);
+                        break;
+                    case 6:
+                        nonAdmissible(n, end);
+                        break;
                     default:
                         h = 0;
                         break;
@@ -225,6 +231,19 @@ public class AStar {
     private double sumDist(Node nodeA, Node nodeB) {
         return Math.abs(nodeA.getX() - nodeB.getX()) + Math.abs(nodeA.getY() - nodeB.getY());
     }
+    
+    private double euclideanDistance(Node nodeA, Node nodeB)
+    {
+        double dx = Math.abs(nodeA.getX() - nodeB.getX());
+        double dy = Math.abs(nodeA.getY() - nodeB.getY());
+        return Math.sqrt(dx*dx + dy*dy);
+    }
+
+    private double nonAdmissible(Node nodeA, Node nodeB)
+    {
+        return 3 * euclideanDistance(nodeA, nodeB);
+    }
+
 
     public boolean pathContains(LinkedList<Node> p, Node n) {
         for (Node x : p) {
