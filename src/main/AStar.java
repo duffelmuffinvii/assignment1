@@ -1,6 +1,5 @@
 package main;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 
 public class AStar {
@@ -11,6 +10,7 @@ public class AStar {
     private int[][] board;
     private int xmax;
     private int ymax;
+    private int timeCost;
 
     public AStar(Node start, Node end, int[][] board, int heuristic) {
         this.start = start;
@@ -21,7 +21,21 @@ public class AStar {
         this.board = board;
         this.xmax = board[0].length;
         this.ymax = board.length;
+        this.timeCost = 0;
     }
+
+    public LinkedList<Node> getFullPath() {
+        LinkedList<Node> currentPath = new LinkedList<>();
+        currentPath.add(start);
+
+        while (!isAt(currentPath.getLast(), end)) {
+            System.out.println("up to y " + currentPath.getLast().getY() + ", x " + currentPath.getLast().getX());
+            currentPath = path(currentPath);
+        }
+
+        return currentPath;
+    };
+
 
     /**
      * The core of A*, setting all the gCost, hCost and direction of the path
@@ -30,10 +44,6 @@ public class AStar {
     public LinkedList<Node> path(LinkedList<Node> path) {
         Node s = path.getLast();
         Node[] adj = getAdj(s);
-        for (Node n : adj) {
-            if (n == null) System.out.println("is null");
-            else System.out.println(n.getY() + ", " + n.getX() + ": " + n.getComplex());
-        }
 
         double fVals[] = new double[4];
 
@@ -73,10 +83,10 @@ public class AStar {
             fVals[i] = h + g;
         }
 
-        double min = fVals[0];
+        double min = 100;
         int minIndex = 0;
         for (int i = 0; i < fVals.length; i++) {
-            if (adj[i] == null) continue;
+            if (adj[i] == null || pathContains(path, adj[i])) continue;
             if (adj[i].getX() == end.getX() && adj[i].getY() == end.getY()) {
                 minIndex = i;
                 break;
@@ -88,6 +98,8 @@ public class AStar {
         }
 
         path.add(adj[minIndex]);
+        dir = minIndex;
+        timeCost += min;
         return path;
 
     }
@@ -148,6 +160,17 @@ public class AStar {
 
     public Node getStart() {
         return start;
+    }
+
+    public boolean pathContains(LinkedList<Node> p, Node n) {
+        for (Node x : p) {
+            if (x.getX() == n.getX() && x.getY() == n.getY()) return true;
+        }
+        return false;
+    }
+
+    public boolean isAt(Node a, Node b) {
+        return a.getX() == b.getX() && a.getY() == b.getY();
     }
 
     //    private void findPath1() {

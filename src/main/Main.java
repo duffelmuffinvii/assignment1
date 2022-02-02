@@ -45,10 +45,12 @@ public class Main {
         {
             for (int j = 0; j < t.get(0).length; j++) {
                 if (t.get(i)[j].equals("S")) {
-                    start = new Node(i, j, 1);
+                    start = new Node(j, i, 1);
+                    board[i][j] = 1;
                     //System.out.println("s");
                 } else if (t.get(i)[j].equals("G")) {
-                    end = new Node(i, j, 1);
+                    end = new Node(j, i, 1);
+                    board[i][j] = 1;
                     //System.out.println("g");
                 }
                 else {
@@ -65,9 +67,7 @@ public class Main {
         }
         else {
             astar = new AStar(start, end, board, inputHeuristic);
-            LinkedList<Node> pStart = new LinkedList<>();
-            pStart.add(astar.getStart());
-            LinkedList<Node> path = astar.path(pStart);
+            LinkedList<Node> path = astar.getFullPath();
             for (Node n : path) {
                 System.out.println("y: " + n.getY() + ", x: " + n.getX());
             }
