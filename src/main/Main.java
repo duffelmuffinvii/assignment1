@@ -58,7 +58,7 @@ public class Main {
                 }
             }
         }
-        printBoard(board);
+        //printBoard(board);
 
         AStar astar;
 

@@ -73,11 +73,32 @@ public class AStar {
                 }
             } else h = 99;
             if (n != null) {
+                // Computes G value based on direction compared to direction robot is currently facing
+                if(i == 4 && !bash){
+                    // Bash case
+                    g = n.getComplex();
+                    bash = true;
+                }
+
+                if(bash){
+                    // Only forward
+                    if (dir == i){
+                        g = n.getComplex();
+                        bash = false;
+                        fVals[i] = h + g;
+                        gVals[i] = g;
+                        continue;
+                    }
+                }
+
                 if (dir == i) {
+                    // Forward direction
                     g = n.getComplex();
                 } else if (Math.abs(dir - i) == 1 || Math.abs(dir - i) == 3) {
+                    // Left or right (adds cost of )
                     g = s.getComplex() / 2 + n.getComplex();
                 } else {
+                    // Backward direction (technically shouldn't occur at all except for at the start)
                     g = s.getComplex() + n.getComplex();
                 }
             } else g = 99;
@@ -123,29 +144,59 @@ public class AStar {
     }
 
     public Node[] getAdj(Node n) {
-        Node[] adj = new Node[4];
+        Node[] adj = new Node[5];
         int x = n.getX();
         int y = n.getY();
 
+        boolean north = coordInBounds(x, y-1);
+        boolean east = coordInBounds(x+1, y);
+        boolean south = coordInBounds(x, y+1);
+        boolean west = coordInBounds(x-1, y);
+
         //N
-        if (coordInBounds(x, y-1)){
+        if (north){
             adj[0] = new Node(x, y-1, board[y-1][x]);
         } else adj[0] = null;
 
         //E
-        if (coordInBounds(x+1, y)){
+        if (east){
             adj[1] = new Node(x+1, y, board[y][x+1]);
         } else adj[1] = null;
 
         //S
-        if (coordInBounds(x, y+1)){
+        if (south){
             adj[2] = new Node(x, y+1, board[y+1][x]);
         } else adj[2] = null;
 
         //W
-        if (coordInBounds(x-1, y)){
+        if (west){
             adj[3] = new Node(x-1, y, board[y][x-1]);
         } else adj[3] = null;
+
+        // Bash
+        switch(dir){
+            case 0:
+                if(north){
+                    adj[4] = new Node(x, y-1, 3);
+                } else adj[4] = null;
+                break;
+            case 1:
+                if(east){
+                    adj[4] = new Node(x+1, y, 3);
+                } else adj[4] = null;
+                break;
+            case 2:
+                if(south){
+                    adj[4] = new Node(x, y+1, 3);
+                } else adj[4] = null;
+                break;
+            case 3:
+                if(west){
+                    adj[4] = new Node(x-1, y, 3);
+                } else adj[4] = null;
+                break;
+        }
+
 
         return adj;
 
