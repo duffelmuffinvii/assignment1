@@ -4,18 +4,23 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 public class AStar {
-    private int startID;
-    private int endID;
-    private LinkedList<Node> allNodes;
-    private char dir;
+    private Node start;
+    private Node end;
+    private int dir;
     private int heuristic;
+    private int[][] board;
+    private int xmax;
+    private int ymax;
 
-    public AStar(int startID, int endID, LinkedList<Node> allNodes, int heuristic) {
-        this.startID = startID;
-        this.endID = endID;
-        this.allNodes = allNodes;
-        this.dir = 'N';
+    public AStar(Node start, Node end, int[][] board, int heuristic) {
+        this.start = start;
+        this.end = end;
+        //this.allNodes = allNodes;
+        this.dir = 0;
         this.heuristic = heuristic;
+        this.board = board;
+        this.xmax = board[0].length;
+        this.ymax = board.length;
     }
 
     /**
@@ -25,6 +30,10 @@ public class AStar {
     public LinkedList<Node> path(LinkedList<Node> path) {
         Node s = path.getLast();
         Node[] adj = getAdj(s);
+        for (Node n : adj) {
+            if (n == null) System.out.println("is null");
+            else System.out.println(n.getY() + ", " + n.getX() + ": " + n.getComplex());
+        }
 
         double fVals[] = new double[4];
 
@@ -50,12 +59,24 @@ public class AStar {
                         h = 0;
                         break;
                 }
-            }
+            } else h = 99;
+            if (n != null) {
+                if (dir == i) {
+                    g = n.getComplex();
+                } else if (Math.abs(dir - i) == 1 || Math.abs(dir - i) == 3) {
+                    g = s.getComplex() / 2 + n.getComplex();
+                } else {
+                    g = s.getComplex() + n.getComplex();
+                }
+            } else g = 99;
+
+            fVals[i] = h + g;
         }
-        
+
         double min = fVals[0];
         int minIndex = 0;
         for (int i = 0; i < fVals.length; i++) {
+            if (adj[i] == null) continue;
             if (adj[i].getX() == end.getX() && adj[i].getY() == end.getY()) {
                 minIndex = i;
                 break;
@@ -65,7 +86,7 @@ public class AStar {
                 minIndex = i;
             }
         }
-        
+
         path.add(adj[minIndex]);
         return path;
 
@@ -77,23 +98,23 @@ public class AStar {
         int y = n.getY();
 
         //N
-        if (coordInBounds(x, y+1)){
-            adj[0] = new Node(x, y+1, board[x][y+1]);
+        if (coordInBounds(x, y-1)){
+            adj[0] = new Node(x, y-1, board[y-1][x]);
         } else adj[0] = null;
 
         //E
         if (coordInBounds(x+1, y)){
-            adj[1] = new Node(x+1, y, board[x+1][y]);
+            adj[1] = new Node(x+1, y, board[y][x+1]);
         } else adj[1] = null;
 
         //S
-        if (coordInBounds(x, y-1)){
-            adj[2] = new Node(x, y-1, board[x][y-1]);
+        if (coordInBounds(x, y+1)){
+            adj[2] = new Node(x, y+1, board[y+1][x]);
         } else adj[2] = null;
 
         //W
         if (coordInBounds(x-1, y)){
-            adj[3] = new Node(x-1, y, board[x-1][y]);
+            adj[3] = new Node(x-1, y, board[y][x-1]);
         } else adj[3] = null;
 
         return adj;
@@ -101,6 +122,7 @@ public class AStar {
     }
 
     public boolean coordInBounds(int x, int y) {
+        //System.out.println(y + ", " + x);
         return x < xmax && x >= 0 && y < ymax && y >= 0;
     }
 
@@ -124,7 +146,11 @@ public class AStar {
         return Math.abs(nodeA.getX() - nodeB.getX()) + Math.abs(nodeA.getY() - nodeB.getY());
     }
 
-//    private void findPath1() {
+    public Node getStart() {
+        return start;
+    }
+
+    //    private void findPath1() {
 //        Node starting = getNodeFromID(startID);
 //        Node ending = getNodeFromID(endID);
 //

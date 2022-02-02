@@ -3,24 +3,25 @@ package main;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
 
         //take in file name (of the board) and number of which heuristic to use
-        Scanner scan = new Scanner(System.in);
-        System.out.println("Enter File Name (for example, Board.txt)");
-        String file_name = scan.nextLine();
-
-        System.out.println("Enter Heuristic Number (1 through 6):");
-        int heuristic = Integer.parseInt(scan.nextLine());
+//        Scanner scan = new Scanner(System.in);
+//        System.out.println("Enter File Name (for example, Board.txt)");
+//        String file_name = scan.nextLine();
+//
+//        System.out.println("Enter Heuristic Number (1 through 6):");
+//        int heuristic = Integer.parseInt(scan.nextLine());
 
         String temp = "";
         ArrayList<String[]> t = new ArrayList<>();
         int inputHeuristic = 1;
         try{
-            File file = new File(args[0]);
+            File file = new File("C:\\Users\\stick\\IdeaProjects\\assignment1real\\maps\\SampleBoard.txt");
             inputHeuristic = Integer.parseInt((args[1]));
             Scanner scanner = new Scanner(file);
             while(scanner.hasNextLine())
@@ -37,41 +38,66 @@ public class Main {
         int r_len = t.size();
         int c_len = t.get(0).length;
         int[][] board = new int[r_len][c_len];
-        Node start;
-        Node end;
+        Node start = new Node(-1, -1, -1);
+        Node end = new Node(-1, -1, -1);;
 
-            for(int i = 0; i < t.size(); i++)
-            {
-                for (int j = 0; j < t.get(0).length; j++) {
-                    System.out.println(t.get(i)[j]);
-                    if (t.get(i)[j].equals("S")) {
-                        start = new Node(i, j, 1);
-                        //System.out.println("s");
-                    } else if (t.get(i)[j].equals("G")) {
-                        end = new Node(i, j, 1);
-                        //System.out.println("g");
-                    }
+        for(int i = 0; i < t.size(); i++)
+        {
+            for (int j = 0; j < t.get(0).length; j++) {
+                if (t.get(i)[j].equals("S")) {
+                    start = new Node(i, j, 1);
+                    //System.out.println("s");
+                } else if (t.get(i)[j].equals("G")) {
+                    end = new Node(i, j, 1);
+                    //System.out.println("g");
+                }
+                else {
+                    board[i][j] = Integer.parseInt(t.get(i)[j]);
                 }
             }
-            printBoard(board);
+        }
+        printBoard(board);
 
+        AStar astar;
 
-        
+        if (start.getX() == -1 || end.getX() == -1) {
+            System.out.println("Missing start or end node");
+        }
+        else {
+            astar = new AStar(start, end, board, inputHeuristic);
+            LinkedList<Node> pStart = new LinkedList<>();
+            pStart.add(astar.getStart());
+            LinkedList<Node> path = astar.path(pStart);
+            for (Node n : path) {
+                System.out.println("y: " + n.getY() + ", x: " + n.getX());
+            }
+        }
+
         //code to generate a board
         int i = 3;
         int j = 4;
-        String[][] b0 = generateBoard(i, j);
+        //String[][] b0 = generateBoard(i, j);
+
+        //AStar astar = new AStar()
 
     }
-    
+
+    public static void printBoard(int[][] board) {
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[0].length; j++)
+                System.out.print(board[i][j] + "\t");
+            System.out.println();
+        }
+    }
+
     public String[][] generateBoard(int i, int j) //pass in desired row and column
     {
         String[][] b = new String[i][j];
-        int[] i_pos = new int[i];
-        int[] j_pos = new int[j];
+        ArrayList<Integer> i_pos = new ArrayList<Integer>();
+        ArrayList<Integer> j_pos = new ArrayList<Integer>();
         int temp;
 
-        for(int u = 0; u < i; u++) //generate list of all possible col positions
+        for(int u = 0; u < i; u++) //generate list of all possible row positions
         {
             i_pos.add(u);
         }
@@ -80,13 +106,14 @@ public class Main {
             j_pos.add(v);
         }
 
-        int g_r = i_pos.get((int) (Math.random()*(i_pos.length))); //give a row spot to the goal state
-        int g_c = j_pos.get((int) (Math.random()*(j_pos.length))); //give a col spot to the goal state
+
+        int g_r = i_pos.get((int) (Math.random()*(i_pos.size()))); //give a row spot to the goal state
+        int g_c = j_pos.get((int) (Math.random()*(j_pos.size()))); //give a col spot to the goal state
         i_pos.remove(g_r);
         j_pos.remove(g_c);
         b[g_r][g_c] = "G";
-        int s_r = i_pos.get((int) (Math.random()*(i_pos.length))); //repeating above with start spot
-        int s_c = j_pos.get((int) (Math.random()*(j_pos.length)));
+        int s_r = i_pos.get((int) (Math.random()*(i_pos.size()))); //repeating above with start spot
+        int s_c = j_pos.get((int) (Math.random()*(j_pos.size())));
         b[s_r][s_c] = "S";
 
 

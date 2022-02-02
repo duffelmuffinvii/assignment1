@@ -12,7 +12,8 @@ public class Node implements Comparable<Node>{
     // Heuristic
     private double h;
     private int complex;
-    private List<Edge> neighbors;
+    // Neighbors
+    private List<Node> neighbors;
 
     enum Directions{
         NORTH,
