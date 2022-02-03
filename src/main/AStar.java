@@ -1,6 +1,6 @@
 package main;
 
-import java.util.LinkedList;
+import java.util.*;
 
 public class AStar {
     private Node start;
@@ -12,6 +12,7 @@ public class AStar {
     private int ymax;
     private double score;
     private int actions;
+    private boolean bash;
 
     public AStar(Node start, Node end, int[][] board, int heuristic) {
         this.start = start;
@@ -24,130 +25,196 @@ public class AStar {
         this.ymax = board.length;
         this.score = 100;
         this.actions = 0;
+        this.bash = false;
     }
+//
+//    public LinkedList<Node> getFullPath() {
+//        LinkedList<Node> currentPath = new LinkedList<>();
+//        currentPath.add(start);
+//
+//        while (!isAt(currentPath.getLast(), end)) {
+//            //System.out.println("up to y " + currentPath.getLast().getY() + ", x " + currentPath.getLast().getX());
+//            currentPath = path(currentPath);
+//        }
+//
+//        return currentPath;
+//    };
 
-    public LinkedList<Node> getFullPath() {
-        LinkedList<Node> currentPath = new LinkedList<>();
-        currentPath.add(start);
-
-        while (!isAt(currentPath.getLast(), end)) {
-            currentPath = path(currentPath);
+    public Node getFullPath() {
+        if(start == null || end == null) {
+            return null;
         }
 
-        return currentPath;
+        PriorityQueue<Node> openPath = new PriorityQueue<>();
+        PriorityQueue<Node> closePath = new PriorityQueue<>();
+        openPath.add(start);
+
+        while (!openPath.isEmpty()) {
+            Node cur = openPath.peek();
+            System.out.println(cur);
+            if(cur == end){
+                return cur;
+            }
+
+            cur.setNeighbors(findNeighbors(cur));
+            for(Node neb: cur.getNeighbors()){
+                if(!openPath.contains(neb) && !closePath.contains(neb)){
+                    openPath.add(neb);
+                } else{
+                    double cost = cur.getG() + (neb.getG()- neb.getComplex());
+                    if(cost < neb.getG()){
+                        if(closePath.contains(neb)){
+                            closePath.remove(neb);
+                            openPath.add(neb);
+                        }
+                    }
+                }
+            }
+            openPath.remove(cur);
+            closePath.add(cur);
+        }
+        return null ;
     };
+
+    public void printPath(Node path){
+        if(path == null){
+            return;
+        }
+
+        List<Node> ns = new ArrayList();
+        while(path.getParent() != null){
+            ns.add(path);
+            path = path.getParent();
+        }
+        ns.add(path);
+        Collections.reverse(ns);
+
+        for(Node n: ns){
+            System.out.println(n);
+        }
+    }
 
 
     /**
      * The core of A*, setting all the gCost, hCost and direction of the path
      */
-
-    public LinkedList<Node> path(LinkedList<Node> path) {
-        Node s = path.getLast();
-        Node[] adj = getAdj(s);
-
-        double fVals[] = new double[4];
-        double gVals[] = new double[4];
-
-        for (int i = 0; i < adj.length; i++) {
-            Node n = adj[i];
-            double h;
+    public List<Node> findNeighbors(Node source){
+        List<Node> neighbors = new ArrayList<>();
+        Node[] nebs = getAdj(source);
+        for(int i=0; i<nebs.length; i++){
+            Node n = nebs[i];
             double g;
-            if (n != null) {
-                switch (heuristic) {
-                    case 1:
-                        h = 0;
-                        break;
-                    case 2:
-                        h = getLowerDist(n, end);
-                        break;
-                    case 3:
-                        h = getHigherDist(n, end);
-                        break;
-                    case 4:
-                        h = sumDist(n, end);
-                        break;
-                    case 5:
-                        euclideanDistance(n, end);
-                        break;
-                    case 6:
-                        nonAdmissible(n, end);
-                        break;
-                    default:
-                        h = 0;
-                        break;
-                }
-            } else h = 99;
+
             if (n != null) {
                 // Computes G value based on direction compared to direction robot is currently facing
-                if(i == 4 && !bash){
-                    // Bash case
-                    g = n.getComplex();
-                    bash = true;
-                }
-
-                if(bash){
-                    // Only forward
-                    if (dir == i){
-                        g = n.getComplex();
-                        bash = false;
-                        fVals[i] = h + g;
-                        gVals[i] = g;
-                        continue;
-                    }
-                }
-
-                if (dir == i) {
-                    // Forward direction
+//              System.out.println("Facing direction: " + dir);
+                if (dir == i) { //|| i == 4
+                    // Forward direction or bash
                     g = n.getComplex();
                 } else if (Math.abs(dir - i) == 1 || Math.abs(dir - i) == 3) {
                     // Left or right (adds cost of )
-                    g = s.getComplex() / 2 + n.getComplex();
+                    g = source.getComplex() / 2 + n.getComplex();
                 } else {
                     // Backward direction (technically shouldn't occur at all except for at the start)
-                    g = s.getComplex() + n.getComplex();
+                    g = source.getComplex() + n.getComplex();
                 }
-            } else g = 99;
 
-            fVals[i] = h + g;
-            gVals[i] = g;
-        }
-
-        double min = 100;
-        int minIndex = 0;
-        for (int i = 0; i < fVals.length; i++) {
-            if (adj[i] == null || pathContains(path, adj[i])) continue;
-            if (adj[i].getX() == end.getX() && adj[i].getY() == end.getY()) {
-                minIndex = i;
-                break;
-            }
-            if (fVals[i] < min) {
-                min = fVals[i];
-                minIndex = i;
+                // Setup neighbor node
+                n.setParent(source);
+                n.setG(g);
+                n.setFCost(g + findHeuristic(n));
+                neighbors.add(n);
             }
         }
-
-        path.add(adj[minIndex]);
-        dir = minIndex;
-        actions++;
-        score -= gVals[minIndex];
-        switch (dir) {
-            case 0:
-                System.out.println("North");
-                break;
-            case 1:
-                System.out.println("East");
-                break;
-            case 2:
-                System.out.println("South");
-                break;
-            case 3:
-                System.out.println("West");
-                break;
-        }
-        return path;
-
+        return neighbors;
     }
+
+//    public LinkedList<Node> path(LinkedList<Node> path) {
+//        Node s = path.getLast();
+//        Node[] adj = getAdj(s);
+//
+//        double fVals[] = new double[5];
+//        double gVals[] = new double[5];
+//
+//        for (int i = 0; i < adj.length; i++) {
+//            Node n = adj[i];
+//            double h;
+//            double g;
+//            if (n != null) {
+//                h = findHeuristic(n);
+//            } else h = 99;
+//
+//            if (n != null) {
+//                // Computes G value based on direction compared to direction robot is currently facing
+//                //System.out.println("Facing direction: " + dir);
+////                if(bash){
+////                    // Only forward
+////                    if (dir == i){
+////                        g = n.getComplex();
+////                        bash = false;
+////                        //System.out.println("Forward after bash: "+ g);
+////                        fVals[i] = h + g;
+////                        gVals[i] = g;
+////                        continue;
+////                    }
+////                }
+//
+//                if (dir == i || i == 4) {
+//                    // Forward direction or bash
+//                    g = n.getComplex();
+//                } else if (Math.abs(dir - i) == 1 || Math.abs(dir - i) == 3) {
+//                    // Left or right (adds cost of )
+//                    g = s.getComplex() / 2 + n.getComplex();
+//                } else {
+//                    // Backward direction (technically shouldn't occur at all except for at the start)
+//                    g = s.getComplex() + n.getComplex();
+//                }
+//            } else g = 99;
+//
+//            fVals[i] = h + g;
+//            gVals[i] = g;
+//        }
+//
+//        double min = 100;
+//        int minIndex = 0;
+//        for (int i = 0; i < fVals.length; i++) {
+//            if (adj[i] == null || pathContains(path, adj[i])) continue;
+//            if (adj[i].getX() == end.getX() && adj[i].getY() == end.getY()) {
+//                //System.out.println("Complex at the end: " + end.getComplex());
+//                minIndex = i;
+//                break;
+//            }
+//            if (fVals[i] < min) {
+//                min = fVals[i];
+//                minIndex = i;
+//            }
+//        }
+//
+//        System.out.println("Cost: " + fVals[minIndex]);
+//        path.add(adj[minIndex]);
+//        dir = minIndex;
+//        actions++;
+//        score -= gVals[minIndex];
+//        switch (minIndex) {
+//            case 0:
+//                System.out.println("North");
+//                break;
+//            case 1:
+//                System.out.println("East");
+//                break;
+//            case 2:
+//                System.out.println("South");
+//                break;
+//            case 3:
+//                System.out.println("West");
+//                break;
+//            case 4:
+//                System.out.println("Bash");
+//                break;
+//        }
+//        return path;
+//
+//    }
 
     public Node[] getAdj(Node n) {
         Node[] adj = new Node[5];
@@ -182,34 +249,60 @@ public class AStar {
         // Bash
         switch(dir){
             case 0:
-                if(north){
-                    adj[4] = new Node(x, y-1, 3);
+                if(coordInBounds(x, y-2)){
+                    adj[4] = new Node(x, y-2, 3 + board[y-2][x]);
                 } else adj[4] = null;
                 break;
             case 1:
-                if(east){
-                    adj[4] = new Node(x+1, y, 3);
+                if(coordInBounds(x+2, y)){
+                    adj[4] = new Node(x+2, y, 3 + board[y][x+2]);
                 } else adj[4] = null;
                 break;
             case 2:
-                if(south){
-                    adj[4] = new Node(x, y+1, 3);
+                if(coordInBounds(x, y+2)){
+                    adj[4] = new Node(x, y+2, 3 + board[y+2][x]);
                 } else adj[4] = null;
                 break;
             case 3:
-                if(west){
-                    adj[4] = new Node(x-1, y, 3);
+                if(coordInBounds(x-2, y)){
+                    adj[4] = new Node(x-2, y, 3 + board[y][x-2]);
                 } else adj[4] = null;
                 break;
         }
-
-
         return adj;
 
     }
 
     public boolean coordInBounds(int x, int y) {
         return x < xmax && x >= 0 && y < ymax && y >= 0;
+    }
+
+    private double findHeuristic(Node n){
+        double h;
+        switch (heuristic) {
+            case 1:
+                h = 0;
+                break;
+            case 2:
+                h = getLowerDist(n, end);
+                break;
+            case 3:
+                h = getHigherDist(n, end);
+                break;
+            case 4:
+                h = sumDist(n, end);
+                break;
+            case 5:
+                h = euclideanDistance(n, end);
+                break;
+            case 6:
+                h = nonAdmissible(n, end);
+                break;
+            default:
+                h = 0;
+                break;
+        }
+        return h;
     }
 
     private double getLowerDist(Node nodeA, Node nodeB) {
@@ -231,7 +324,7 @@ public class AStar {
     private double sumDist(Node nodeA, Node nodeB) {
         return Math.abs(nodeA.getX() - nodeB.getX()) + Math.abs(nodeA.getY() - nodeB.getY());
     }
-    
+
     private double euclideanDistance(Node nodeA, Node nodeB)
     {
         double dx = Math.abs(nodeA.getX() - nodeB.getX());

@@ -67,10 +67,14 @@ public class Main {
         }
         else {
             astar = new AStar(start, end, board, inputHeuristic);
-            LinkedList<Node> path = astar.getFullPath();
+            Node fullpath = astar.getFullPath();
+            astar.printPath(fullpath);
 
-            System.out.println(astar.getActions() + " actions");
-            System.out.println("Score: " + astar.getScore());
+//            astar = new AStar(start, end, board, inputHeuristic);
+//            LinkedList<Node> path = astar.getFullPath();
+//
+//            System.out.println(astar.getActions() + " actions");
+//            System.out.println("Score: " + astar.getScore());
         }
 
         //code to generate a board

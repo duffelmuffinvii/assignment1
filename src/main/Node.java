@@ -11,6 +11,7 @@ public class Node implements Comparable<Node>{
     private double g;
     // Heuristic
     private double h;
+    private double f;
     private double complex;
     // Neighbors
     private List<Node> neighbors;
@@ -78,20 +79,25 @@ public class Node implements Comparable<Node>{
     }
 
     public double getFCost() {
-        return g + h;
+       return f = g + h;
     }
+    public void setFCost(double f){this.f = f;}
 
     public double getComplex() {return this.complex;}
 
     public List<Node> getNeighbors() {
         return neighbors;
     }
-    public void setNeighbors(ArrayList<Node> neighbors) {
+    public void setNeighbors(List<Node> neighbors) {
         this.neighbors = neighbors;
     }
 
     @Override
     public int compareTo(Node n) {
-        return Double.compare(this.getFCost(), n.getFCost());
+        return Double.compare(this.f, n.f);
+    }
+
+    public String toString(){
+        return "Node at ["+ x + ", "+ y + "] with cost of: " + g;
     }
 }
