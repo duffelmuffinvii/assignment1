@@ -46,6 +46,7 @@ public class Main {
             for (int j = 0; j < t.get(0).length; j++) {
                 if (t.get(i)[j].equals("S")) {
                     start = new Node(j, i, 1);
+                    start.setDir(0);
                     board[i][j] = 1;
                     //System.out.println("s");
                 } else if (t.get(i)[j].equals("G")) {
@@ -68,7 +69,7 @@ public class Main {
         else {
             astar = new AStar(start, end, board, inputHeuristic);
             Node fullpath = astar.getFullPath();
-            astar.printPath(fullpath);
+            //astar.printPath(fullpath);
 
 //            astar = new AStar(start, end, board, inputHeuristic);
 //            LinkedList<Node> path = astar.getFullPath();

@@ -5,7 +5,6 @@ import java.util.*;
 public class AStar {
     private Node start;
     private Node end;
-    private int dir;
     private int heuristic;
     private int[][] board;
     private int xmax;
@@ -18,7 +17,6 @@ public class AStar {
         this.start = start;
         this.end = end;
         //this.allNodes = allNodes;
-        this.dir = 0;
         this.heuristic = heuristic;
         this.board = board;
         this.xmax = board[0].length;
@@ -48,10 +46,11 @@ public class AStar {
         PriorityQueue<Node> openPath = new PriorityQueue<>();
         PriorityQueue<Node> closePath = new PriorityQueue<>();
         openPath.add(start);
+        int step=0;
 
         while (!openPath.isEmpty()) {
             Node cur = openPath.peek();
-            System.out.println(cur);
+            //System.out.println(cur + " facing direction: " + cur.getDir());
             if(cur == end){
                 return cur;
             }
@@ -72,10 +71,18 @@ public class AStar {
             }
             openPath.remove(cur);
             closePath.add(cur);
+            step++;
+            printPathQueue(openPath, "OPEN Step: " + step + " ");
+            printPathQueue(closePath, "CLOSED Step: " + step);
         }
         return null ;
     };
 
+    public void printPathQueue(PriorityQueue<Node> queue, String message){
+        for(Node n: queue){
+            System.out.println(message + n);
+        }
+    }
     public void printPath(Node path){
         if(path == null){
             return;
@@ -101,6 +108,7 @@ public class AStar {
     public List<Node> findNeighbors(Node source){
         List<Node> neighbors = new ArrayList<>();
         Node[] nebs = getAdj(source);
+        int dir = source.getDir();
         for(int i=0; i<nebs.length; i++){
             Node n = nebs[i];
             double g;
@@ -111,11 +119,14 @@ public class AStar {
                 if (dir == i) { //|| i == 4
                     // Forward direction or bash
                     g = n.getComplex();
+                    n.setDir(i);
                 } else if (Math.abs(dir - i) == 1 || Math.abs(dir - i) == 3) {
                     // Left or right (adds cost of )
                     g = source.getComplex() / 2 + n.getComplex();
+                    n.setDir(Math.abs(dir-i));
                 } else {
                     // Backward direction (technically shouldn't occur at all except for at the start)
+                    n.setDir(Math.abs(dir-2*i));
                     g = source.getComplex() + n.getComplex();
                 }
 
@@ -217,7 +228,8 @@ public class AStar {
 //    }
 
     public Node[] getAdj(Node n) {
-        Node[] adj = new Node[5];
+        Node[] adj = new Node[4];
+        int dir = n.getDir();
         int x = n.getX();
         int y = n.getY();
 
@@ -246,29 +258,29 @@ public class AStar {
             adj[3] = new Node(x-1, y, board[y][x-1]);
         } else adj[3] = null;
 
-        // Bash
-        switch(dir){
-            case 0:
-                if(coordInBounds(x, y-2)){
-                    adj[4] = new Node(x, y-2, 3 + board[y-2][x]);
-                } else adj[4] = null;
-                break;
-            case 1:
-                if(coordInBounds(x+2, y)){
-                    adj[4] = new Node(x+2, y, 3 + board[y][x+2]);
-                } else adj[4] = null;
-                break;
-            case 2:
-                if(coordInBounds(x, y+2)){
-                    adj[4] = new Node(x, y+2, 3 + board[y+2][x]);
-                } else adj[4] = null;
-                break;
-            case 3:
-                if(coordInBounds(x-2, y)){
-                    adj[4] = new Node(x-2, y, 3 + board[y][x-2]);
-                } else adj[4] = null;
-                break;
-        }
+//        // Bash
+//        switch(dir){
+//            case 0:
+//                if(coordInBounds(x, y-2)){
+//                    adj[4] = new Node(x, y-2, 3 + board[y-2][x]);
+//                } else adj[4] = null;
+//                break;
+//            case 1:
+//                if(coordInBounds(x+2, y)){
+//                    adj[4] = new Node(x+2, y, 3 + board[y][x+2]);
+//                } else adj[4] = null;
+//                break;
+//            case 2:
+//                if(coordInBounds(x, y+2)){
+//                    adj[4] = new Node(x, y+2, 3 + board[y+2][x]);
+//                } else adj[4] = null;
+//                break;
+//            case 3:
+//                if(coordInBounds(x-2, y)){
+//                    adj[4] = new Node(x-2, y, 3 + board[y][x-2]);
+//                } else adj[4] = null;
+//                break;
+//        }
         return adj;
 
     }

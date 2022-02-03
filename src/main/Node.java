@@ -13,6 +13,7 @@ public class Node implements Comparable<Node>{
     private double h;
     private double f;
     private double complex;
+    private int dir;
     // Neighbors
     private List<Node> neighbors;
 
@@ -92,11 +93,19 @@ public class Node implements Comparable<Node>{
         this.neighbors = neighbors;
     }
 
+    public int getDir() {
+        return dir;
+    }
+    public void setDir(int dir) {
+        this.dir = dir;
+    }
+
     @Override
     public int compareTo(Node n) {
         return Double.compare(this.f, n.f);
     }
 
+    @Override
     public String toString(){
         return "Node at ["+ x + ", "+ y + "] with cost of: " + g;
     }
