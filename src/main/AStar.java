@@ -45,6 +45,8 @@ public class AStar {
 
         PriorityQueue<Node> openPath = new PriorityQueue<>();
         PriorityQueue<Node> closePath = new PriorityQueue<>();
+        start.setG(start.getComplex());
+        start.setFCost(start.getG() + findHeuristic(start));
         openPath.add(start);
         int step=0;
 
@@ -55,12 +57,15 @@ public class AStar {
                 return cur;
             }
 
-            cur.setNeighbors(findNeighbors(cur));
-            for(Node neb: cur.getNeighbors()){
+            List<Node> curNeb = findNeighbors(cur);
+            System.out.println("SIZE: " + curNeb.size());
+            for(Node neb: curNeb){
+                System.out.println(!closePath.contains(neb));
                 if(!openPath.contains(neb) && !closePath.contains(neb)){
                     openPath.add(neb);
                 } else{
                     double cost = cur.getG() + (neb.getG()- neb.getComplex());
+                    System.out.println("COST: "+ cost);
                     if(cost < neb.getG()){
                         if(closePath.contains(neb)){
                             closePath.remove(neb);
@@ -72,8 +77,12 @@ public class AStar {
             openPath.remove(cur);
             closePath.add(cur);
             step++;
+            System.out.println("DIRECTION: " + cur.getDir());
             printPathQueue(openPath, "OPEN Step: " + step + " ");
             printPathQueue(closePath, "CLOSED Step: " + step);
+            if(step == 2){
+                break;
+            }
         }
         return null ;
     };
@@ -137,6 +146,7 @@ public class AStar {
                 neighbors.add(n);
             }
         }
+        //System.out.println("SIZE: " +neighbors.size());
         return neighbors;
     }
 
