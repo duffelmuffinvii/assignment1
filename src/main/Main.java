@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.Scanner;
 
 public class Main {
@@ -69,7 +70,7 @@ public class Main {
         else {
             astar = new AStar(start, end, board, inputHeuristic);
             Node fullpath = astar.getFullPath();
-            //astar.printPath(fullpath);
+            astar.printPath(fullpath);
 
 //            astar = new AStar(start, end, board, inputHeuristic);
 //            LinkedList<Node> path = astar.getFullPath();

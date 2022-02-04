@@ -1,5 +1,6 @@
 package main;
 
+import java.text.Collator;
 import java.util.*;
 
 public class AStar {
@@ -43,58 +44,80 @@ public class AStar {
             return null;
         }
 
-        Queue<Node> openPath = new PriorityQueue<>();
-        Queue<Node> closePath = new PriorityQueue<>();
-        start.setG(start.getComplex());
+        LinkedList<Node> openPath = new LinkedList<>();
+        LinkedList<Node> closePath = new LinkedList<>();
+        start.setG(0);
         start.setFCost(start.getG() + findHeuristic(start));
         openPath.add(start);
         int step=0;
 
         while (!openPath.isEmpty()) {
             Node cur = openPath.peek();
-            //System.out.println(cur + " facing direction: " + cur.getDir());
-            if(cur == end){
+            System.out.println("");
+            System.out.println("CURRENTLY AT " + cur);
+            if(cur.getX() == end.getX() && cur.getY() == end.getY()){
                 return cur;
             }
 
             //printStartNode(cur);
             List<Node> curNeb = findNeighbors(cur);
-            System.out.println("SIZE: " + curNeb.size());
+            //System.out.println("SIZE: " + curNeb.size());
+
             for(Node neb: curNeb){
                 //printStartNode(neb);
-                System.out.println(!closePath.contains(neb));
-                if(!openPath.contains(neb) && !closePath.contains(neb)){
+                //System.out.println(!listContainsNode(closePath, neb));
+                double totalWeight = cur.getG() + neb.getWeight();
+                if(!listContainsNode(openPath, neb) && !listContainsNode(closePath, neb)){
+//                    if(neb.getX() == 1 && neb.getY() == 0){
+//                        System.out.println(cur.getG() + ", should be 7");
+//                        System.out.println(neb.getComplex() + ", should be 1!");
+//                        System.out.println(totalWeight + ", weight so far - 9");
+//                    }
+                    neb.setParent(cur);
+                    neb.setG(totalWeight + neb.getComplex());
+                    neb.setFCost(neb.getG() + findHeuristic(neb));
                     openPath.add(neb);
                 } else{
-                    double cost = cur.getG() + (neb.getG()- neb.getComplex());
-                    System.out.println("COST: "+ cost);
-                    if(cost < neb.getG()){
-                        if(closePath.contains(neb)){
+                    //double cost = cur.getG() + (neb.getG()- neb.getComplex());
+                    //System.out.println("COST: "+ cost);
+                    if(totalWeight < neb.getG()){
+                        neb.setParent(cur);
+                        neb.setG(totalWeight + neb.getComplex());
+                        neb.setFCost(neb.getG() + findHeuristic(neb));
+                        if(listContainsNode(closePath, neb)){
                             closePath.remove(neb);
                             openPath.add(neb);
                         }
                     }
                 }
             }
+            Collections.sort(openPath);
             openPath.remove(cur);
             closePath.add(cur);
             step++;
-            System.out.println("DIRECTION: " + cur.getDir());
-            printPathQueue(openPath, "OPEN Step: " + step + " ");
-            printPathQueue(closePath, "CLOSED Step: " + step);
-            if(step == 2){
-                break;
-            }
+//            System.out.println("DIRECTION: " + cur.getDir());
+//            printPathQueue(openPath, "OPEN Step: " + step + " ");
+//            //printPathQueue(closePath, "CLOSED Step: " + step);
+//            if(step == 20){
+//                break;
+//            }
         }
-        return null ;
+        return null;
     };
+
+    public boolean listContainsNode(LinkedList<Node> list, Node n) {
+        for (Node m : list) {
+            if (m.getX() == n.getX() && m.getY() == n.getY()) return true;
+        }
+        return false;
+    }
 
     public void printStartNode(Node n){
         if(n.getX() == 2 && n.getY() == 2){
             System.out.println("START COST: " + n.getFCost());
         }
     }
-    public void printPathQueue(Queue<Node> queue, String message){
+    public void printPathQueue(LinkedList<Node> queue, String message){
         for(Node n: queue){
             System.out.println(message + n);
         }
@@ -127,31 +150,37 @@ public class AStar {
         int dir = source.getDir();
         for(int i=0; i<nebs.length; i++){
             Node n = nebs[i];
-            double g;
+            //double g;
             double weight;
 
             if (n != null) {
                 // Computes G value based on direction compared to direction robot is currently facing
 //              System.out.println("Facing direction: " + dir);
-                g = n.getComplex();
+                //g = n.getComplex();
                 if (dir == i) { //|| i == 4
                     // Forward direction or bash
                     weight = 0;
-                    n.setDir(i);
+                    if(i != 4){
+                        n.setDir(i);
+                    }
                 } else if (Math.abs(dir - i) == 1 || Math.abs(dir - i) == 3) {
                     // Left or right (adds cost of )
                     weight = source.getComplex() / 2;
                     n.setDir(Math.abs(dir-i));
-                } else {
+                } else if (i==4){
+                    weight = 3;
+                }
+                else {
                     // Backward direction (technically shouldn't occur at all except for at the start)
-                    n.setDir(Math.abs(dir-2*i));
+                    n.setDir(Math.abs(i));
                     weight = source.getComplex();
                 }
 
                 // Setup neighbor node
-                n.setParent(source);
-                n.setG(g + weight);
-                n.setFCost(g + findHeuristic(n));
+                n.setWeight(weight);
+//                if(n.getX() == 1 && n.getY() == 0){
+//                    System.out.println(weight + "should be 2");
+//                }
                 neighbors.add(n);
             }
         }
@@ -247,7 +276,7 @@ public class AStar {
 //    }
 
     public Node[] getAdj(Node n) {
-        Node[] adj = new Node[4];
+        Node[] adj = new Node[5];
         int dir = n.getDir();
         int x = n.getX();
         int y = n.getY();
@@ -277,29 +306,29 @@ public class AStar {
             adj[3] = new Node(x-1, y, board[y][x-1]);
         } else adj[3] = null;
 
-//        // Bash
-//        switch(dir){
-//            case 0:
-//                if(coordInBounds(x, y-2)){
-//                    adj[4] = new Node(x, y-2, 3 + board[y-2][x]);
-//                } else adj[4] = null;
-//                break;
-//            case 1:
-//                if(coordInBounds(x+2, y)){
-//                    adj[4] = new Node(x+2, y, 3 + board[y][x+2]);
-//                } else adj[4] = null;
-//                break;
-//            case 2:
-//                if(coordInBounds(x, y+2)){
-//                    adj[4] = new Node(x, y+2, 3 + board[y+2][x]);
-//                } else adj[4] = null;
-//                break;
-//            case 3:
-//                if(coordInBounds(x-2, y)){
-//                    adj[4] = new Node(x-2, y, 3 + board[y][x-2]);
-//                } else adj[4] = null;
-//                break;
-//        }
+        // Bash
+        switch(dir){
+            case 0:
+                if(coordInBounds(x, y-2)){
+                    adj[4] = new Node(x, y-2, board[y-2][x]);
+                } else adj[4] = null;
+                break;
+            case 1:
+                if(coordInBounds(x+2, y)){
+                    adj[4] = new Node(x+2, y, board[y][x+2]);
+                } else adj[4] = null;
+                break;
+            case 2:
+                if(coordInBounds(x, y+2)){
+                    adj[4] = new Node(x, y+2, board[y+2][x]);
+                } else adj[4] = null;
+                break;
+            case 3:
+                if(coordInBounds(x-2, y)){
+                    adj[4] = new Node(x-2, y, board[y][x-2]);
+                } else adj[4] = null;
+                break;
+        }
         return adj;
 
     }
