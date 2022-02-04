@@ -11,7 +11,7 @@ public class Node implements Comparable<Node>{
     private double g;
     // Heuristic
     private double h;
-    private double f;
+    private double f = Double.MAX_VALUE;
     private double complex;
     private int dir;
     // Neighbors
@@ -80,7 +80,7 @@ public class Node implements Comparable<Node>{
     }
 
     public double getFCost() {
-       return f = g + h;
+       return f;
     }
     public void setFCost(double f){this.f = f;}
 

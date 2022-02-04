@@ -43,8 +43,8 @@ public class AStar {
             return null;
         }
 
-        PriorityQueue<Node> openPath = new PriorityQueue<>();
-        PriorityQueue<Node> closePath = new PriorityQueue<>();
+        Queue<Node> openPath = new PriorityQueue<>();
+        Queue<Node> closePath = new PriorityQueue<>();
         start.setG(start.getComplex());
         start.setFCost(start.getG() + findHeuristic(start));
         openPath.add(start);
@@ -57,9 +57,11 @@ public class AStar {
                 return cur;
             }
 
+            //printStartNode(cur);
             List<Node> curNeb = findNeighbors(cur);
             System.out.println("SIZE: " + curNeb.size());
             for(Node neb: curNeb){
+                //printStartNode(neb);
                 System.out.println(!closePath.contains(neb));
                 if(!openPath.contains(neb) && !closePath.contains(neb)){
                     openPath.add(neb);
@@ -87,7 +89,12 @@ public class AStar {
         return null ;
     };
 
-    public void printPathQueue(PriorityQueue<Node> queue, String message){
+    public void printStartNode(Node n){
+        if(n.getX() == 2 && n.getY() == 2){
+            System.out.println("START COST: " + n.getFCost());
+        }
+    }
+    public void printPathQueue(Queue<Node> queue, String message){
         for(Node n: queue){
             System.out.println(message + n);
         }
@@ -121,27 +128,29 @@ public class AStar {
         for(int i=0; i<nebs.length; i++){
             Node n = nebs[i];
             double g;
+            double weight;
 
             if (n != null) {
                 // Computes G value based on direction compared to direction robot is currently facing
 //              System.out.println("Facing direction: " + dir);
+                g = n.getComplex();
                 if (dir == i) { //|| i == 4
                     // Forward direction or bash
-                    g = n.getComplex();
+                    weight = 0;
                     n.setDir(i);
                 } else if (Math.abs(dir - i) == 1 || Math.abs(dir - i) == 3) {
                     // Left or right (adds cost of )
-                    g = source.getComplex() / 2 + n.getComplex();
+                    weight = source.getComplex() / 2;
                     n.setDir(Math.abs(dir-i));
                 } else {
                     // Backward direction (technically shouldn't occur at all except for at the start)
                     n.setDir(Math.abs(dir-2*i));
-                    g = source.getComplex() + n.getComplex();
+                    weight = source.getComplex();
                 }
 
                 // Setup neighbor node
                 n.setParent(source);
-                n.setG(g);
+                n.setG(g + weight);
                 n.setFCost(g + findHeuristic(n));
                 neighbors.add(n);
             }
