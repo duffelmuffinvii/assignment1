@@ -125,6 +125,7 @@ public class AStar {
         List<Node> ns = new ArrayList();
         List<String> moves = new ArrayList<>();
         while(path.getParent() != null){
+            //System.out.println("PARENT: " + path.getParent().getDir() + " VS PATH: " + path.getDir());
             ns.add(path);
             moves.add(checkMove(path.getParent(), path));
             path = path.getParent();
@@ -143,11 +144,11 @@ public class AStar {
             System.out.println(s);
         }
 
-//
-//
-//        for(Node n: ns){
-//            System.out.println(n);
-//        }
+
+
+        for(Node n: ns){
+            System.out.println(n);
+        }
     }
 
     public String checkMove(Node start, Node end){
@@ -245,6 +246,13 @@ public class AStar {
                     if(i != 4){
                         n.setDir(i);
                     }
+                } else if (i == 4){
+                    weight = 3;
+//                    if(n.getX() == end.getX() && n.getY() == end.getY()){
+//                        System.out.println("FINAL BASH?");
+//                    }
+
+                    n.setDir(dir);
                 } else if (Math.abs(dir - i) == 1 || Math.abs(dir - i) == 3) {
                     // Left or right (adds cost of )
                     weight = Math.ceil(source.getComplex() / 2);
@@ -265,10 +273,7 @@ public class AStar {
                         }
                     }
                     //n.setDir(Math.abs(dir-i));
-                } else if (i==4){
-                    weight = 3;
-                }
-                else {
+                } else {
                     // Backward direction (technically shouldn't occur at all except for at the start)
                     n.setDir(Math.abs(i));
                     weight = source.getComplex();
