@@ -143,7 +143,7 @@ public class AStar {
             System.out.println(s);
         }
 
-
+//
 //
 //        for(Node n: ns){
 //            System.out.println(n);
@@ -165,6 +165,7 @@ public class AStar {
         int difY = endY - startY;
         int difDir = endDir - startDir;
         int difF = (int) (endF - startF);
+        int difFNoWeight = (int) (difF-end.getWeight());
 
         if(difDir == 0){
             // Same direction
@@ -200,21 +201,21 @@ public class AStar {
             }
         } else if(difDir == 1 || difDir == -3){
             // Turn Right
-            String out = "Right (" + end.getWeight() + ")"
-                    + "\nForward (" + (difF-end.getWeight()) + ")";
+            String out = "Right (" + (int) end.getWeight() + ")"
+                    + "\nForward (" + difFNoWeight + ")";
             actions+=2;
             return out;
 
         } else if(difDir == -1 || difDir == 3){
             // Turn Left
-            String out = "Left (" + end.getWeight() + ")"
-                    + "\nForward (" + (difF-end.getWeight())  + ")";
+            String out = "Left (" + (int) end.getWeight() + ")"
+                    + "\nForward (" + difFNoWeight  + ")";
             actions+=2;
             return out;
         } else{
             // Backward
-            String out = "Rotate back (" + end.getWeight() + ")"
-                    + "\nForward (" + (difF-end.getWeight())  + ")";
+            String out = "Rotate back (" + (int) end.getWeight() + ")"
+                    + "\nForward (" + difFNoWeight  + ")";
             actions+=2;
             return out;
         }
@@ -247,7 +248,23 @@ public class AStar {
                 } else if (Math.abs(dir - i) == 1 || Math.abs(dir - i) == 3) {
                     // Left or right (adds cost of )
                     weight = Math.ceil(source.getComplex() / 2);
-                    n.setDir(Math.abs(dir-i));
+                    if((dir - i) == 1 || (dir - i) == -3){
+                        // Turn Left
+                        if(dir == 0){
+                            n.setDir(3);
+                        } else{
+                            n.setDir(dir-1);
+                        }
+                    }
+                    if((dir - i) == -1 || (dir - i) == 3){
+                        // Turn Right
+                        if(dir == 3){
+                            n.setDir(0);
+                        } else{
+                            n.setDir(dir+1);
+                        }
+                    }
+                    //n.setDir(Math.abs(dir-i));
                 } else if (i==4){
                     weight = 3;
                 }
