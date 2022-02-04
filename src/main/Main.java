@@ -72,7 +72,7 @@ public class Main {
             Node fullpath = astar.getFullPath();
             astar.printPath(fullpath);
 
-            System.out.println("Score: " + astar.getScore());
+
 
 //            astar = new AStar(start, end, board, inputHeuristic);
 //            LinkedList<Node> path = astar.getFullPath();

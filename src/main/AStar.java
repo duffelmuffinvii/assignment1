@@ -10,9 +10,11 @@ public class AStar {
     private int[][] board;
     private int xmax;
     private int ymax;
-    private double score;
+    private int score;
     private int actions;
     private boolean bash;
+    private int expandedNode;
+
 
     public AStar(Node start, Node end, int[][] board, int heuristic) {
         this.start = start;
@@ -25,6 +27,7 @@ public class AStar {
         this.score = 100;
         this.actions = 0;
         this.bash = false;
+        this.expandedNode = 0;
     }
 //
 //    public LinkedList<Node> getFullPath() {
@@ -53,10 +56,10 @@ public class AStar {
 
         while (!openPath.isEmpty()) {
             Node cur = openPath.peek();
-            System.out.println("");
-            System.out.println("CURRENTLY AT " + cur);
+//            System.out.println("");
+//            System.out.println("CURRENTLY AT " + cur);
             if(cur.getX() == end.getX() && cur.getY() == end.getY()){
-                score = 100 - cur.getG();
+                score = (int) (100 - cur.getG());
                 return cur;
             }
 
@@ -78,6 +81,7 @@ public class AStar {
                     neb.setG(totalWeight + neb.getComplex());
                     neb.setFCost(neb.getG() + findHeuristic(neb));
                     openPath.add(neb);
+                    expandedNode++;
                 } else{
                     //double cost = cur.getG() + (neb.getG()- neb.getComplex());
                     //System.out.println("COST: "+ cost);
@@ -113,32 +117,108 @@ public class AStar {
         return false;
     }
 
-    public void printStartNode(Node n){
-        if(n.getX() == 2 && n.getY() == 2){
-            System.out.println("START COST: " + n.getFCost());
-        }
-    }
-    public void printPathQueue(LinkedList<Node> queue, String message){
-        for(Node n: queue){
-            System.out.println(message + n);
-        }
-    }
     public void printPath(Node path){
         if(path == null){
             return;
         }
 
         List<Node> ns = new ArrayList();
+        List<String> moves = new ArrayList<>();
         while(path.getParent() != null){
             ns.add(path);
+            moves.add(checkMove(path.getParent(), path));
             path = path.getParent();
         }
         ns.add(path);
         Collections.reverse(ns);
+        Collections.reverse(moves);
 
-        for(Node n: ns){
-            System.out.println(n);
+
+        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        System.out.println("Score: " + score);
+        System.out.println("Number of actions: " + actions);
+        System.out.println("Number of expanded nodes: " + expandedNode);
+        System.out.println("Series of actions: ");
+        for(String s: moves){
+            System.out.println(s);
         }
+
+
+//
+//        for(Node n: ns){
+//            System.out.println(n);
+//        }
+    }
+
+    public String checkMove(Node start, Node end){
+        int startX = start.getX();
+        int startY = start.getY();
+        int startDir = start.getDir();
+        double startF = start.getFCost();
+        int endX = end.getX();
+        int endY = end.getY();
+        int endDir = end.getDir();
+        double endF = end.getFCost();
+
+        // Differences
+        int difX = endX - startX;
+        int difY = endY - startY;
+        int difDir = endDir - startDir;
+        int difF = (int) (endF - startF);
+
+        if(difDir == 0){
+            // Same direction
+            switch(startDir){
+                case 0:
+                case 2:
+                    // North or South
+                    if(Math.abs(difY) == 1){
+                        String out = "Forward (" + difF + ")";
+                        actions++;
+                        return out;
+                    }
+                    if(Math.abs(difY) == 2){
+                        String out = "Bash (3)" + "\nForward (" + (difF-3) + ")";
+                        actions+=2;
+                        return out;
+                    }
+                    break;
+                case 1:
+                case 3:
+                    // East or West
+                    if(Math.abs(difX) == 1){
+                        String out = "Forward (" + difF + ")";
+                        actions++;
+                        return out;
+                    }
+                    if(Math.abs(difX) == 2){
+                        String out = "Bash (3)" + "\nForward (" + (difF-3) + ")";
+                        actions+=2;
+                        return out;
+                    }
+                    break;
+            }
+        } else if(difDir == 1 || difDir == -3){
+            // Turn Right
+            String out = "Right (" + end.getWeight() + ")"
+                    + "\nForward (" + (difF-end.getWeight()) + ")";
+            actions+=2;
+            return out;
+
+        } else if(difDir == -1 || difDir == 3){
+            // Turn Left
+            String out = "Left (" + end.getWeight() + ")"
+                    + "\nForward (" + (difF-end.getWeight())  + ")";
+            actions+=2;
+            return out;
+        } else{
+            // Backward
+            String out = "Rotate back (" + end.getWeight() + ")"
+                    + "\nForward (" + (difF-end.getWeight())  + ")";
+            actions+=2;
+            return out;
+        }
+        return "";
     }
 
 
@@ -166,7 +246,7 @@ public class AStar {
                     }
                 } else if (Math.abs(dir - i) == 1 || Math.abs(dir - i) == 3) {
                     // Left or right (adds cost of )
-                    weight = source.getComplex() / 2;
+                    weight = Math.ceil(source.getComplex() / 2);
                     n.setDir(Math.abs(dir-i));
                 } else if (i==4){
                     weight = 3;
