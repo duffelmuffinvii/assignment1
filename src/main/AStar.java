@@ -15,11 +15,9 @@ public class AStar {
     private boolean bash;
     private int expandedNode;
 
-
     public AStar(Node start, Node end, int[][] board, int heuristic) {
         this.start = start;
         this.end = end;
-        //this.allNodes = allNodes;
         this.heuristic = heuristic;
         this.board = board;
         this.xmax = board[0].length;
@@ -29,18 +27,6 @@ public class AStar {
         this.bash = false;
         this.expandedNode = 0;
     }
-//
-//    public LinkedList<Node> getFullPath() {
-//        LinkedList<Node> currentPath = new LinkedList<>();
-//        currentPath.add(start);
-//
-//        while (!isAt(currentPath.getLast(), end)) {
-//            //System.out.println("up to y " + currentPath.getLast().getY() + ", x " + currentPath.getLast().getX());
-//            currentPath = path(currentPath);
-//        }
-//
-//        return currentPath;
-//    };
 
     public Node getFullPath() {
         if(start == null || end == null) {
@@ -52,39 +38,24 @@ public class AStar {
         start.setG(0);
         start.setFCost(start.getG() + findHeuristic(start));
         openPath.add(start);
-        int step=0;
 
         while (!openPath.isEmpty()) {
             Node cur = openPath.peek();
-//            System.out.println("");
-//            System.out.println("CURRENTLY AT " + cur);
             if(cur.getX() == end.getX() && cur.getY() == end.getY()){
                 score = (int) (100 - cur.getG());
                 return cur;
             }
-
-            //printStartNode(cur);
             List<Node> curNeb = findNeighbors(cur);
-            //System.out.println("SIZE: " + curNeb.size());
 
             for(Node neb: curNeb){
-                //printStartNode(neb);
-                //System.out.println(!listContainsNode(closePath, neb));
                 double totalWeight = cur.getG() + neb.getWeight();
                 if(!listContainsNode(openPath, neb) && !listContainsNode(closePath, neb)){
-//                    if(neb.getX() == 1 && neb.getY() == 0){
-//                        System.out.println(cur.getG() + ", should be 7");
-//                        System.out.println(neb.getComplex() + ", should be 1!");
-//                        System.out.println(totalWeight + ", weight so far - 9");
-//                    }
                     neb.setParent(cur);
                     neb.setG(totalWeight + neb.getComplex());
                     neb.setFCost(neb.getG() + findHeuristic(neb));
                     openPath.add(neb);
                     expandedNode++;
                 } else{
-                    //double cost = cur.getG() + (neb.getG()- neb.getComplex());
-                    //System.out.println("COST: "+ cost);
                     if(totalWeight < neb.getG()){
                         neb.setParent(cur);
                         neb.setG(totalWeight + neb.getComplex());
@@ -99,13 +70,6 @@ public class AStar {
             Collections.sort(openPath);
             openPath.remove(cur);
             closePath.add(cur);
-            step++;
-//            System.out.println("DIRECTION: " + cur.getDir());
-//            printPathQueue(openPath, "OPEN Step: " + step + " ");
-//            //printPathQueue(closePath, "CLOSED Step: " + step);
-//            if(step == 20){
-//                break;
-//            }
         }
         return null;
     };
@@ -125,7 +89,6 @@ public class AStar {
         List<Node> ns = new ArrayList();
         List<String> moves = new ArrayList<>();
         while(path.getParent() != null){
-            //System.out.println("PARENT: " + path.getParent().getDir() + " VS PATH: " + path.getDir());
             ns.add(path);
             moves.add(checkMove(path.getParent(), path));
             path = path.getParent();
@@ -133,7 +96,6 @@ public class AStar {
         ns.add(path);
         Collections.reverse(ns);
         Collections.reverse(moves);
-
 
         System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         System.out.println("Score: " + score);
@@ -143,15 +105,10 @@ public class AStar {
         for(String s: moves){
             System.out.println(s);
         }
-
-
-
-        for(Node n: ns){
-            System.out.println(n);
-        }
     }
 
     public String checkMove(Node start, Node end){
+        // Hardcoding series of actions
         int startX = start.getX();
         int startY = start.getY();
         int startDir = start.getDir();
@@ -223,7 +180,6 @@ public class AStar {
         return "";
     }
 
-
     /**
      * The core of A*, setting all the gCost, hCost and direction of the path
      */
@@ -233,25 +189,19 @@ public class AStar {
         int dir = source.getDir();
         for(int i=0; i<nebs.length; i++){
             Node n = nebs[i];
-            //double g;
             double weight;
 
             if (n != null) {
                 // Computes G value based on direction compared to direction robot is currently facing
-//              System.out.println("Facing direction: " + dir);
-                //g = n.getComplex();
-                if (dir == i) { //|| i == 4
-                    // Forward direction or bash
+                if (dir == i) {
+                    // Forward direction
                     weight = 0;
                     if(i != 4){
                         n.setDir(i);
                     }
                 } else if (i == 4){
+                    // BASH
                     weight = 3;
-//                    if(n.getX() == end.getX() && n.getY() == end.getY()){
-//                        System.out.println("FINAL BASH?");
-//                    }
-
                     n.setDir(dir);
                 } else if (Math.abs(dir - i) == 1 || Math.abs(dir - i) == 3) {
                     // Left or right (adds cost of )
@@ -272,113 +222,18 @@ public class AStar {
                             n.setDir(dir+1);
                         }
                     }
-                    //n.setDir(Math.abs(dir-i));
                 } else {
                     // Backward direction (technically shouldn't occur at all except for at the start)
                     n.setDir(Math.abs(i));
                     weight = source.getComplex();
                 }
-
                 // Setup neighbor node
                 n.setWeight(weight);
-//                if(n.getX() == 1 && n.getY() == 0){
-//                    System.out.println(weight + "should be 2");
-//                }
                 neighbors.add(n);
             }
         }
-        //System.out.println("SIZE: " +neighbors.size());
         return neighbors;
     }
-
-
-
-//    public LinkedList<Node> path(LinkedList<Node> path) {
-//        Node s = path.getLast();
-//        Node[] adj = getAdj(s);
-//
-//        double fVals[] = new double[5];
-//        double gVals[] = new double[5];
-//
-//        for (int i = 0; i < adj.length; i++) {
-//            Node n = adj[i];
-//            double h;
-//            double g;
-//            if (n != null) {
-//                h = findHeuristic(n);
-//            } else h = 99;
-//
-//            if (n != null) {
-//                // Computes G value based on direction compared to direction robot is currently facing
-//                //System.out.println("Facing direction: " + dir);
-////                if(bash){
-////                    // Only forward
-////                    if (dir == i){
-////                        g = n.getComplex();
-////                        bash = false;
-////                        //System.out.println("Forward after bash: "+ g);
-////                        fVals[i] = h + g;
-////                        gVals[i] = g;
-////                        continue;
-////                    }
-////                }
-//
-//                if (dir == i || i == 4) {
-//                    // Forward direction or bash
-//                    g = n.getComplex();
-//                } else if (Math.abs(dir - i) == 1 || Math.abs(dir - i) == 3) {
-//                    // Left or right (adds cost of )
-//                    g = s.getComplex() / 2 + n.getComplex();
-//                } else {
-//                    // Backward direction (technically shouldn't occur at all except for at the start)
-//                    g = s.getComplex() + n.getComplex();
-//                }
-//            } else g = 99;
-//
-//            fVals[i] = h + g;
-//            gVals[i] = g;
-//        }
-//
-//        double min = 100;
-//        int minIndex = 0;
-//        for (int i = 0; i < fVals.length; i++) {
-//            if (adj[i] == null || pathContains(path, adj[i])) continue;
-//            if (adj[i].getX() == end.getX() && adj[i].getY() == end.getY()) {
-//                //System.out.println("Complex at the end: " + end.getComplex());
-//                minIndex = i;
-//                break;
-//            }
-//            if (fVals[i] < min) {
-//                min = fVals[i];
-//                minIndex = i;
-//            }
-//        }
-//
-//        System.out.println("Cost: " + fVals[minIndex]);
-//        path.add(adj[minIndex]);
-//        dir = minIndex;
-//        actions++;
-//        score -= gVals[minIndex];
-//        switch (minIndex) {
-//            case 0:
-//                System.out.println("North");
-//                break;
-//            case 1:
-//                System.out.println("East");
-//                break;
-//            case 2:
-//                System.out.println("South");
-//                break;
-//            case 3:
-//                System.out.println("West");
-//                break;
-//            case 4:
-//                System.out.println("Bash");
-//                break;
-//        }
-//        return path;
-//
-//    }
 
     public Node[] getAdj(Node n) {
         Node[] adj = new Node[5];
@@ -435,7 +290,6 @@ public class AStar {
                 break;
         }
         return adj;
-
     }
 
     public boolean coordInBounds(int x, int y) {
@@ -517,143 +371,7 @@ public class AStar {
     public int getActions() {
         return actions;
     }
-
     public double getScore() {
         return score;
     }
-
-    //    private void findPath1() {
-//        Node starting = getNodeFromID(startID);
-//        Node ending = getNodeFromID(endID);
-//
-//        // list of nodes that are open to be evaluated
-//        LinkedList<Node> openNodes = new LinkedList<>();
-//
-//        // Hashset of nodes has already been visited and evaluated
-//        HashSet<Node> visitedNodes = new HashSet<>();
-//
-//        // adding the starting node to the openNodes list
-//        openNodes.add(starting);
-
-    // looping
-//        while(!openNodes.isEmpty()){
-//
-//            Node currentNode = openNodes.getFirst();
-//
-//            // traverse through the open list and find the node with the lowest fCost
-//            for (Node n: openNodes){
-//                if (lowerFCost(n,currentNode)){
-//                    currentNode = n;
-//                }
-//            }
-//            //remove the current node from the openNodes list and add it to the visited nodes list
-//            openNodes.remove(currentNode);
-//            visitedNodes.add(currentNode);
-//
-//            // if true, path has been found, then return
-//            if (isEnd(currentNode)){return; }
-//
-//            for (Node neighbor: adjacenciesToNodes(currentNode) ){ //adjacencies has to list of  nodes
-//
-//                // we need to discuss about the conditions that make a node "walkable" - all our nodes are walkable
-//                //skip to the next neighbor
-//                if (visitedNodes.contains(neighbor))
-//                    continue;
-//
-//                double h;
-//
-//                switch (heuristic) {
-//                    case 0:
-//                        h = 0;
-//                        break;
-//                    case 1:
-//                        h = getLowerDist(currentNode, neighbor);
-//                        break;
-//                    case 2:
-//                        h = getHigherDist(currentNode, neighbor);
-//                        break;
-//                    case 3:
-//                        h = sumDist(currentNode, neighbor);
-//                        break;
-//                    default:
-//                        h = getDistance(currentNode, neighbor);
-//                }
-//
-//                double newMovementCostToNeighbor = currentNode.getG() + h;
-//
-//                if (newMovementCostToNeighbor < neighbor.getG() || !openNodes.contains(neighbor)){
-//                    neighbor.setG(newMovementCostToNeighbor);
-//
-//                    switch (heuristic) {
-//                        case 0:
-//                            neighbor.setH(0);
-//                            break;
-//                        case 1:
-//                            neighbor.setH(getLowerDist(neighbor, ending));
-//                            break;
-//                        case 2:
-//                            neighbor.setH(getHigherDist(neighbor, ending));
-//                            break;
-//                        case 3:
-//                            neighbor.setH(sumDist(neighbor, ending));
-//                            break;
-//                        default:
-//                            neighbor.setH(getDistance(neighbor, ending));
-//
-//                    }
-//                    neighbor.setParent(currentNode);
-//
-//                    if (!openNodes.contains(neighbor)) openNodes.add(neighbor);
-//                }
-//            }
-//        }
-//    }
-
-//    public LinkedList<Node> adjacenciesToNodes(Node node) {
-//        LinkedList<Node> list = new LinkedList<>();
-//        for (int s : node.getAdjacencies()) {
-//            for (Node n : allNodes) {
-//                if (n.getID() == s) list.add(n);
-//            }
-//        }
-//        return list;
-//    }
-
-//    private Node getNodeFromID(int ID){
-//        try {
-//            for (Node n : allNodes) {
-//                if (ID == n.getID()) {
-//                    return n;
-//                }
-//            }
-//        }
-//        catch (Exception e){
-//            return null;
-//        }
-//        return null;
-//    }
-
-//    public boolean lowerFCost(Node n , Node currentNode) {
-//        return n.getFCost() < currentNode.getFCost() ||
-//                (n.getFCost() == currentNode.getFCost() && n.getH() < currentNode.getH());
-//    }
-//
-//    public boolean isEnd(Node n) {
-//        return n.getID() == endID;
-//    }
-//
-//    private double getDistance(Node nodeA, Node nodeB){
-//        double nodeAXCoordinate = nodeA.getX();
-//        double nodeAYCoordinate = nodeA.getY();
-//        double nodeBXCoordinate = nodeB.getX();
-//        double nodeBYCoordinate = nodeB.getY();
-//
-//        double xDifference = nodeBXCoordinate - nodeAXCoordinate;
-//        double yDifference = nodeBYCoordinate - nodeAYCoordinate;
-//
-//        return (int)Math.sqrt(xDifference*xDifference + yDifference*yDifference);
-//    }
-//
-
-
 }

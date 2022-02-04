@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Node implements Comparable<Node>{
-    private int ID;
     private int x, y;
     private Node parent = null;
     // Cost so far
@@ -18,38 +17,11 @@ public class Node implements Comparable<Node>{
     // Neighbors
     private List<Node> neighbors;
 
-    enum Directions{
-        NORTH,
-        WEST,
-        EAST,
-        SOUTH
-    }
-
     public Node(int x, int y, int complex) {
         this.x = x;
         this.y = y;
         this.neighbors = new ArrayList<>();
         this.complex = complex;
-    }
-
-//    private void initNeighbor(){
-//        switch(dir){
-//            case NORTH:
-//
-//            case WEST:
-//            case EAST:
-//            case SOUTH:
-//            default:
-//                break;
-//        }
-//    }
-
-//    public boolean inBound(int x, int y){
-//        return x >= 0 && x <= xmax && y >= 0 && y <= ymax;
-//    }
-
-    public int getID() {
-        return ID;
     }
 
     public Node getParent() {
@@ -115,7 +87,7 @@ public class Node implements Comparable<Node>{
 
     @Override
     public String toString(){
-        return "Node at ["+ x + ", "+ y + "] with cost of: " + g;
+        return "Node at ["+ x + ", "+ y + "] with cost of: " + f;
     }
 
 }

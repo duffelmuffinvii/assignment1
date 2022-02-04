@@ -11,13 +11,6 @@ public class Main {
     public static void main(String[] args) {
 
         //take in file name (of the board) and number of which heuristic to use
-//        Scanner scan = new Scanner(System.in);
-//        System.out.println("Enter File Name (for example, Board.txt)");
-//        String file_name = scan.nextLine();
-//
-//        System.out.println("Enter Heuristic Number (1 through 6):");
-//        int heuristic = Integer.parseInt(scan.nextLine());
-
         String temp = "";
         ArrayList<String[]> t = new ArrayList<>();
         int inputHeuristic = 1;
@@ -49,21 +42,17 @@ public class Main {
                     start = new Node(j, i, 1);
                     start.setDir(0);
                     board[i][j] = 1;
-                    //System.out.println("s");
                 } else if (t.get(i)[j].equals("G")) {
                     end = new Node(j, i, 1);
                     board[i][j] = 1;
-                    //System.out.println("g");
                 }
                 else {
                     board[i][j] = Integer.parseInt(t.get(i)[j]);
                 }
             }
         }
-        //printBoard(board);
 
         AStar astar;
-
         if (start.getX() == -1 || end.getX() == -1) {
             System.out.println("Missing start or end node");
         }
@@ -71,23 +60,7 @@ public class Main {
             astar = new AStar(start, end, board, inputHeuristic);
             Node fullpath = astar.getFullPath();
             astar.printPath(fullpath);
-
-
-
-//            astar = new AStar(start, end, board, inputHeuristic);
-//            LinkedList<Node> path = astar.getFullPath();
-//
-//            System.out.println(astar.getActions() + " actions");
-//            System.out.println("Score: " + astar.getScore());
         }
-
-        //code to generate a board
-        int i = 3;
-        int j = 4;
-        //String[][] b0 = generateBoard(i, j);
-
-        //AStar astar = new AStar()
-
     }
 
     public static void printBoard(int[][] board) {
@@ -136,7 +109,6 @@ public class Main {
                 }
             }
         }
-
         return b;
     }
 }
