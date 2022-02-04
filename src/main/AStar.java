@@ -56,6 +56,7 @@ public class AStar {
             System.out.println("");
             System.out.println("CURRENTLY AT " + cur);
             if(cur.getX() == end.getX() && cur.getY() == end.getY()){
+                score = 100 - cur.getG();
                 return cur;
             }
 
@@ -187,6 +188,8 @@ public class AStar {
         //System.out.println("SIZE: " +neighbors.size());
         return neighbors;
     }
+
+
 
 //    public LinkedList<Node> path(LinkedList<Node> path) {
 //        Node s = path.getLast();
