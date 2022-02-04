@@ -45,7 +45,6 @@ public class AStar {
 
         PriorityQueue<Node> openPath = new PriorityQueue<>();
         PriorityQueue<Node> closePath = new PriorityQueue<>();
-        start.setG(start.getComplex());
         start.setFCost(start.getG() + findHeuristic(start));
         openPath.add(start);
         int step=0;
@@ -61,12 +60,11 @@ public class AStar {
             System.out.println("SIZE: " + curNeb.size());
             for(Node neb: curNeb){
                 System.out.println(!closePath.contains(neb));
+                double totalWeight = cur.getG() + neb.getWeight();
                 if(!openPath.contains(neb) && !closePath.contains(neb)){
                     openPath.add(neb);
                 } else{
-                    double cost = cur.getG() + (neb.getG()- neb.getComplex());
-                    System.out.println("COST: "+ cost);
-                    if(cost < neb.getG()){
+                    if(totalWeight < neb.getG()){
                         if(closePath.contains(neb)){
                             closePath.remove(neb);
                             openPath.add(neb);
@@ -127,22 +125,25 @@ public class AStar {
 //              System.out.println("Facing direction: " + dir);
                 if (dir == i) { //|| i == 4
                     // Forward direction or bash
-                    g = n.getComplex();
+                    g = n.getG();
+                    //n.setWeight(0);
                     n.setDir(i);
                 } else if (Math.abs(dir - i) == 1 || Math.abs(dir - i) == 3) {
                     // Left or right (adds cost of )
-                    g = source.getComplex() / 2 + n.getComplex();
+                    g = source.getG() / 2 + n.getG();
+                    //n.setWeight(source.getG()/2);
                     n.setDir(Math.abs(dir-i));
                 } else {
                     // Backward direction (technically shouldn't occur at all except for at the start)
                     n.setDir(Math.abs(dir-2*i));
-                    g = source.getComplex() + n.getComplex();
+                    //n.setWeight(source.getG());
+                    g = source.getG() + n.getG();
                 }
 
                 // Setup neighbor node
                 n.setParent(source);
                 n.setG(g);
-                n.setFCost(g + findHeuristic(n));
+                n.setFCost(n.getG()+ findHeuristic(n));
                 neighbors.add(n);
             }
         }
@@ -150,92 +151,11 @@ public class AStar {
         return neighbors;
     }
 
-//    public LinkedList<Node> path(LinkedList<Node> path) {
-//        Node s = path.getLast();
-//        Node[] adj = getAdj(s);
-//
-//        double fVals[] = new double[5];
-//        double gVals[] = new double[5];
-//
-//        for (int i = 0; i < adj.length; i++) {
-//            Node n = adj[i];
-//            double h;
-//            double g;
-//            if (n != null) {
-//                h = findHeuristic(n);
-//            } else h = 99;
-//
-//            if (n != null) {
-//                // Computes G value based on direction compared to direction robot is currently facing
-//                //System.out.println("Facing direction: " + dir);
-////                if(bash){
-////                    // Only forward
-////                    if (dir == i){
-////                        g = n.getComplex();
-////                        bash = false;
-////                        //System.out.println("Forward after bash: "+ g);
-////                        fVals[i] = h + g;
-////                        gVals[i] = g;
-////                        continue;
-////                    }
-////                }
-//
-//                if (dir == i || i == 4) {
-//                    // Forward direction or bash
-//                    g = n.getComplex();
-//                } else if (Math.abs(dir - i) == 1 || Math.abs(dir - i) == 3) {
-//                    // Left or right (adds cost of )
-//                    g = s.getComplex() / 2 + n.getComplex();
-//                } else {
-//                    // Backward direction (technically shouldn't occur at all except for at the start)
-//                    g = s.getComplex() + n.getComplex();
-//                }
-//            } else g = 99;
-//
-//            fVals[i] = h + g;
-//            gVals[i] = g;
-//        }
-//
-//        double min = 100;
-//        int minIndex = 0;
-//        for (int i = 0; i < fVals.length; i++) {
-//            if (adj[i] == null || pathContains(path, adj[i])) continue;
-//            if (adj[i].getX() == end.getX() && adj[i].getY() == end.getY()) {
-//                //System.out.println("Complex at the end: " + end.getComplex());
-//                minIndex = i;
-//                break;
-//            }
-//            if (fVals[i] < min) {
-//                min = fVals[i];
-//                minIndex = i;
-//            }
-//        }
-//
-//        System.out.println("Cost: " + fVals[minIndex]);
-//        path.add(adj[minIndex]);
-//        dir = minIndex;
-//        actions++;
-//        score -= gVals[minIndex];
-//        switch (minIndex) {
-//            case 0:
-//                System.out.println("North");
-//                break;
-//            case 1:
-//                System.out.println("East");
-//                break;
-//            case 2:
-//                System.out.println("South");
-//                break;
-//            case 3:
-//                System.out.println("West");
-//                break;
-//            case 4:
-//                System.out.println("Bash");
-//                break;
-//        }
-//        return path;
-//
-//    }
+    public void printStart(Node n){
+        if(n.getX() == 2 && n.getY() == 2){
+            System.out.println("STARTING F = " + n.getFCost());
+        }
+    }
 
     public Node[] getAdj(Node n) {
         Node[] adj = new Node[4];
@@ -378,6 +298,93 @@ public class AStar {
     public double getScore() {
         return score;
     }
+
+    //    public LinkedList<Node> path(LinkedList<Node> path) {
+//        Node s = path.getLast();
+//        Node[] adj = getAdj(s);
+//
+//        double fVals[] = new double[5];
+//        double gVals[] = new double[5];
+//
+//        for (int i = 0; i < adj.length; i++) {
+//            Node n = adj[i];
+//            double h;
+//            double g;
+//            if (n != null) {
+//                h = findHeuristic(n);
+//            } else h = 99;
+//
+//            if (n != null) {
+//                // Computes G value based on direction compared to direction robot is currently facing
+//                //System.out.println("Facing direction: " + dir);
+////                if(bash){
+////                    // Only forward
+////                    if (dir == i){
+////                        g = n.getComplex();
+////                        bash = false;
+////                        //System.out.println("Forward after bash: "+ g);
+////                        fVals[i] = h + g;
+////                        gVals[i] = g;
+////                        continue;
+////                    }
+////                }
+//
+//                if (dir == i || i == 4) {
+//                    // Forward direction or bash
+//                    g = n.getComplex();
+//                } else if (Math.abs(dir - i) == 1 || Math.abs(dir - i) == 3) {
+//                    // Left or right (adds cost of )
+//                    g = s.getComplex() / 2 + n.getComplex();
+//                } else {
+//                    // Backward direction (technically shouldn't occur at all except for at the start)
+//                    g = s.getComplex() + n.getComplex();
+//                }
+//            } else g = 99;
+//
+//            fVals[i] = h + g;
+//            gVals[i] = g;
+//        }
+//
+//        double min = 100;
+//        int minIndex = 0;
+//        for (int i = 0; i < fVals.length; i++) {
+//            if (adj[i] == null || pathContains(path, adj[i])) continue;
+//            if (adj[i].getX() == end.getX() && adj[i].getY() == end.getY()) {
+//                //System.out.println("Complex at the end: " + end.getComplex());
+//                minIndex = i;
+//                break;
+//            }
+//            if (fVals[i] < min) {
+//                min = fVals[i];
+//                minIndex = i;
+//            }
+//        }
+//
+//        System.out.println("Cost: " + fVals[minIndex]);
+//        path.add(adj[minIndex]);
+//        dir = minIndex;
+//        actions++;
+//        score -= gVals[minIndex];
+//        switch (minIndex) {
+//            case 0:
+//                System.out.println("North");
+//                break;
+//            case 1:
+//                System.out.println("East");
+//                break;
+//            case 2:
+//                System.out.println("South");
+//                break;
+//            case 3:
+//                System.out.println("West");
+//                break;
+//            case 4:
+//                System.out.println("Bash");
+//                break;
+//        }
+//        return path;
+//
+//    }
 
     //    private void findPath1() {
 //        Node starting = getNodeFromID(startID);

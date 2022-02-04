@@ -12,7 +12,9 @@ public class Node implements Comparable<Node>{
     // Heuristic
     private double h;
     private double f;
-    private double complex;
+    // Extra cost (turning) prior to move
+    private double weight;
+    // Direction
     private int dir;
     // Neighbors
     private List<Node> neighbors;
@@ -24,28 +26,13 @@ public class Node implements Comparable<Node>{
         SOUTH
     }
 
-    public Node(int x, int y, int complex) {
+    public Node(int x, int y, int g) {
         this.x = x;
         this.y = y;
         this.neighbors = new ArrayList<>();
-        this.complex = complex;
+        this.g = g;
+        this.weight = 0;
     }
-
-//    private void initNeighbor(){
-//        switch(dir){
-//            case NORTH:
-//
-//            case WEST:
-//            case EAST:
-//            case SOUTH:
-//            default:
-//                break;
-//        }
-//    }
-
-//    public boolean inBound(int x, int y){
-//        return x >= 0 && x <= xmax && y >= 0 && y <= ymax;
-//    }
 
     public int getID() {
         return ID;
@@ -84,8 +71,6 @@ public class Node implements Comparable<Node>{
     }
     public void setFCost(double f){this.f = f;}
 
-    public double getComplex() {return this.complex;}
-
     public List<Node> getNeighbors() {
         return neighbors;
     }
@@ -99,6 +84,9 @@ public class Node implements Comparable<Node>{
     public void setDir(int dir) {
         this.dir = dir;
     }
+
+    public double getWeight() {return weight;}
+    public void setWeight(double weight) {this.weight = weight;}
 
     @Override
     public int compareTo(Node n) {
